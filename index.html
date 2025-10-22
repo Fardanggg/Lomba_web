@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SidoKita - Platform Warga Sidoarjo</title>
+    <title>DARJO KU - Platform Warga Sidoarjo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -14,7 +14,7 @@
         }
         
         .logo-glow {
-            filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5));
+            filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5));
         }
         
         .float-animation {
@@ -90,14 +90,28 @@
         .delay-500 {
             animation-delay: 0.5s;
         }
+        
+        .logo-container {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 12px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-text {
+            font-weight: 900;
+            font-size: 1.5rem;
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-green-50 to-teal-50">
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50">
     <!-- Floating Background Blobs -->
     <div class="fixed inset-0 -z-10 overflow-hidden">
-        <div class="absolute -top-40 -right-40 w-80 h-80 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 float-animation"></div>
-        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 float-animation" style="animation-delay: 1.5s;"></div>
-        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 float-animation" style="animation-delay: 3s;"></div>
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 float-animation"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 float-animation" style="animation-delay: 1.5s;"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 float-animation" style="animation-delay: 3s;"></div>
     </div>
 
     <!-- Navigation Bar -->
@@ -105,21 +119,22 @@
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <!-- Logo & Brand -->
             <div class="flex items-center space-x-3">
-                <div class="logo-glow w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center transform rotate-12">
-                    <i class="fas fa-leaf text-white"></i>
+                <div class="logo-glow w-12 h-12 rounded-lg flex items-center justify-center">
+                    <!-- Placeholder untuk logo DARJO KU -->
+                    <img src="foto/logo.png" alt="DARJO KU" class="h-10">
                 </div>
                 <div class="text-2xl font-black">
-                    <span class="text-black">SIDO</span>
-                    <span class="bg-gradient-to-r from-green-500 to-emerald-600 bg-clip-text text-transparent">KITA</span>
+                    <span class="text-black">DARJO</span>
+                    <span class="bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent">KU</span>
                 </div>
             </div>
             
             <!-- Desktop Menu -->
             <div class="hidden md:flex items-center space-x-8">
-                <a href="#fitur" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Fitur</a>
-                <a href="#tentang" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Tentang</a>
-                <a href="#kontak" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Kontak</a>
-                <button class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-full transition-colors shadow-md">
+                <a href="#fitur" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Fitur</a>
+                <a href="#tentang" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Tentang</a>
+                <a href="#kontak" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Kontak</a>
+                <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-full transition-colors shadow-md">
                     MASUK
                 </button>
             </div>
@@ -133,10 +148,10 @@
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4 border-t border-gray-200">
             <div class="flex flex-col space-y-4 mt-4">
-                <a href="#fitur" class="text-gray-700 hover:text-green-600 font-medium">Fitur</a>
-                <a href="#tentang" class="text-gray-700 hover:text-green-600 font-medium">Tentang</a>
-                <a href="#kontak" class="text-gray-700 hover:text-green-600 font-medium">Kontak</a>
-                <button class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-full w-full transition-colors">
+                <a href="#fitur" class="text-gray-700 hover:text-blue-600 font-medium">Fitur</a>
+                <a href="#tentang" class="text-gray-700 hover:text-blue-600 font-medium">Tentang</a>
+                <a href="#kontak" class="text-gray-700 hover:text-blue-600 font-medium">Kontak</a>
+                <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full w-full transition-colors">
                     MASUK
                 </button>
             </div>
@@ -150,22 +165,22 @@
                 <!-- Left Content -->
                 <div class="lg:w-1/2 mb-12 lg:mb-0">
                     <div class="slide-in delay-100">
-                        <span class="inline-block bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full mb-4">
-                            🌱 BETA VERSION - GRATIS SELAMANYA
+                        <span class="inline-block bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full mb-4">
+                            🚀 BETA VERSION - GRATIS SELAMANYA
                         </span>
                     </div>
                     
                     <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-tight mb-6 slide-in delay-200">
-                        Platform Warga Sidoarjo yang <span class="text-green-600">Beneran Berguna</span>
+                        Platform Warga Sidoarjo <span class="text-blue-600">Milik Kita Semua</span>
                     </h1>
                     
                     <p class="text-lg md:text-xl text-gray-700 mb-8 slide-in delay-300">
-                        Gak cuma ngomong doang, kita bikin platform yang lu butuhin. Dari info UMKM sampe laporan jalan rusak, semua ada di sini.
+                        Dari warga, oleh warga, untuk warga Sidoarjo. Semua kebutuhan informasi dan layanan ada di sini.
                     </p>
                     
                     <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-10 slide-in delay-400">
-                        <button class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-all transform hover:scale-105">
-                            COBA SEKARANG
+                        <button class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-all transform hover:scale-105">
+                            GABUNG SEKARANG
                         </button>
                         <button class="bg-white hover:bg-gray-100 text-gray-800 font-bold py-4 px-8 rounded-full border border-gray-300 shadow-md transition-all">
                             LIHAT DEMO
@@ -175,11 +190,11 @@
                     <div class="flex items-center space-x-6 slide-in delay-500">
                         <div class="flex items-center space-x-2">
                             <div class="flex -space-x-2">
-                                <div class="w-8 h-8 bg-green-500 rounded-full border-2 border-white"></div>
                                 <div class="w-8 h-8 bg-blue-500 rounded-full border-2 border-white"></div>
-                                <div class="w-8 h-8 bg-pink-500 rounded-full border-2 border-white"></div>
+                                <div class="w-8 h-8 bg-indigo-500 rounded-full border-2 border-white"></div>
+                                <div class="w-8 h-8 bg-purple-500 rounded-full border-2 border-white"></div>
                             </div>
-                            <span class="text-gray-700 font-semibold">2,000+ warga</span>
+                            <span class="text-gray-700 font-semibold">3,500+ warga</span>
                         </div>
                         <div class="flex items-center space-x-2">
                             <div class="flex">
@@ -189,7 +204,7 @@
                                 <i class="fas fa-star text-yellow-400"></i>
                                 <i class="fas fa-star text-yellow-400"></i>
                             </div>
-                            <span class="text-gray-700 font-semibold">4.9/5 rating</span>
+                            <span class="text-gray-700 font-semibold">4.8/5 rating</span>
                         </div>
                     </div>
                 </div>
@@ -199,25 +214,25 @@
                     <div class="bg-white p-6 rounded-2xl shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-300 card-hover shine-effect max-w-md">
                         <div class="grid grid-cols-2 gap-4">
                             <div class="bg-gradient-to-br from-blue-100 to-blue-200 p-4 rounded-xl text-center">
-                                <div class="text-3xl font-black text-blue-700 mb-1">250+</div>
+                                <div class="text-3xl font-black text-blue-700 mb-1">350+</div>
                                 <div class="text-sm font-semibold text-blue-800">UMKM</div>
                             </div>
-                            <div class="bg-gradient-to-br from-green-100 to-green-200 p-4 rounded-xl text-center">
-                                <div class="text-3xl font-black text-green-700 mb-1">1.2K+</div>
-                                <div class="text-sm font-semibold text-green-800">Warga Terbantu</div>
+                            <div class="bg-gradient-to-br from-indigo-100 to-indigo-200 p-4 rounded-xl text-center">
+                                <div class="text-3xl font-black text-indigo-700 mb-1">2.1K+</div>
+                                <div class="text-sm font-semibold text-indigo-800">Warga Terbantu</div>
                             </div>
                             <div class="bg-gradient-to-br from-amber-100 to-amber-200 p-4 rounded-xl text-center">
-                                <div class="text-3xl font-black text-amber-700 mb-1">450+</div>
+                                <div class="text-3xl font-black text-amber-700 mb-1">620+</div>
                                 <div class="text-sm font-semibold text-amber-800">Laporan</div>
                             </div>
                             <div class="bg-gradient-to-br from-purple-100 to-purple-200 p-4 rounded-xl text-center">
-                                <div class="text-3xl font-black text-purple-700 mb-1">180+</div>
+                                <div class="text-3xl font-black text-purple-700 mb-1">240+</div>
                                 <div class="text-sm font-semibold text-purple-800">Lowongan</div>
                             </div>
                         </div>
                         <div class="mt-6 pt-4 border-t border-gray-200">
                             <p class="text-center text-gray-600 text-sm">
-                                Data real-time dari komunitas SidoKita
+                                Data real-time dari komunitas DARJO KU
                             </p>
                         </div>
                     </div>
@@ -231,7 +246,7 @@
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-12">
                 <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">
-                    Apa Aja Sih Isinya?
+                    Fitur Unggulan DARJO KU
                 </h2>
                 <span class="inline-block bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold px-3 py-1 rounded-full">
                     ✨ FITUR LENGKAP
@@ -240,24 +255,24 @@
             
             <!-- Bento Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                <!-- SIDOINFO - Large Card -->
-                <div class="md:col-span-2 md:row-span-2 bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl p-6 text-white card-hover shine-effect">
+                <!-- DARJOINFO - Large Card -->
+                <div class="md:col-span-2 md:row-span-2 bg-gradient-to-br from-blue-500 to-indigo-700 rounded-3xl p-6 text-white card-hover shine-effect">
                     <div class="relative h-full flex flex-col">
                         <div class="absolute top-0 right-0 w-24 h-24 -mt-4 -mr-4 bg-white/10 rounded-full"></div>
                         <div class="flex items-center mb-4">
                             <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mr-3">
-                                <i class="fas fa-shopping-bag text-xl"></i>
+                                <i class="fas fa-info-circle text-xl"></i>
                             </div>
-                            <h3 class="text-2xl font-black">SIDOINFO</h3>
+                            <h3 class="text-2xl font-black">DARJOINFO</h3>
                         </div>
                         <p class="text-blue-100 mb-6 flex-grow">
-                            Database UMKM lengkap, review produk, event komunitas, dan peta interaktif. Semua info warga Sidoarjo ada di sini.
+                            Pusat informasi terupdate untuk warga Sidoarjo. Mulai dari berita terkini, agenda kegiatan, hingga database UMKM lokal.
                         </p>
                         <div class="flex flex-wrap gap-2 mb-6">
+                            <span class="bg-white/20 px-3 py-1 rounded-full text-sm">Berita Lokal</span>
                             <span class="bg-white/20 px-3 py-1 rounded-full text-sm">Database UMKM</span>
-                            <span class="bg-white/20 px-3 py-1 rounded-full text-sm">Review</span>
-                            <span class="bg-white/20 px-3 py-1 rounded-full text-sm">Event Komunitas</span>
-                            <span class="bg-white/20 px-3 py-1 rounded-full text-sm">Maps</span>
+                            <span class="bg-white/20 px-3 py-1 rounded-full text-sm">Agenda Kegiatan</span>
+                            <span class="bg-white/20 px-3 py-1 rounded-full text-sm">Peta Interaktif</span>
                         </div>
                         <button class="bg-white text-blue-600 font-bold py-3 px-6 rounded-full self-start hover:bg-blue-50 transition-colors">
                             Jelajahi Sekarang
@@ -269,17 +284,17 @@
                 <div class="bg-gradient-to-br from-pink-500 to-rose-600 rounded-3xl p-6 text-white card-hover shine-effect">
                     <div class="flex items-center mb-4">
                         <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-3">
-                            <i class="fas fa-heart text-lg"></i>
+                            <i class="fas fa-hands-helping text-lg"></i>
                         </div>
                         <h3 class="text-xl font-black">BANTUWARGA</h3>
                     </div>
                     <p class="text-pink-100 mb-4">
-                        Wadah untuk saling membantu sesama warga Sidoarjo.
+                        Wadah gotong royong digital untuk saling membantu sesama warga Sidoarjo.
                     </p>
                     <div class="flex flex-wrap gap-2">
                         <span class="bg-white/20 px-2 py-1 rounded-full text-xs">Donasi</span>
-                        <span class="bg-white/20 px-2 py-1 rounded-full text-xs">Volunteer</span>
-                        <span class="bg-white/20 px-2 py-1 rounded-full text-xs">Marketplace</span>
+                        <span class="bg-white/20 px-2 py-1 rounded-full text-xs">Relawan</span>
+                        <span class="bg-white/20 px-2 py-1 rounded-full text-xs">Bantuan Darurat</span>
                     </div>
                 </div>
                 
@@ -287,25 +302,25 @@
                 <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl p-6 text-white card-hover shine-effect">
                     <div class="flex items-center mb-4">
                         <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-3">
-                            <i class="fas fa-exclamation-circle text-lg"></i>
+                            <i class="fas fa-road text-lg"></i>
                         </div>
                         <h3 class="text-xl font-black">LAPORJALAN</h3>
                     </div>
                     <p class="text-amber-100">
-                        Laporkan masalah infrastruktur, tracking status laporan, dan upload foto bukti.
+                        Laporkan masalah infrastruktur dengan mudah. Pantau status laporan secara real-time.
                     </p>
                 </div>
                 
                 <!-- LOWONGANLOKAL -->
-                <div class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-3xl p-6 text-white card-hover shine-effect">
+                <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl p-6 text-white card-hover shine-effect">
                     <div class="flex items-center mb-4">
                         <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-3">
                             <i class="fas fa-briefcase text-lg"></i>
                         </div>
                         <h3 class="text-xl font-black">LOWONGANLOKAL</h3>
                     </div>
-                    <p class="text-emerald-100">
-                        Job board khusus untuk lowongan kerja di sekitar Sidoarjo.
+                    <p class="text-indigo-100">
+                        Temukan peluang kerja dan usaha di sekitar Sidoarjo. Khusus untuk warga lokal.
                     </p>
                 </div>
             </div>
@@ -317,44 +332,44 @@
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-12">
                 <h2 class="text-3xl md:text-4xl font-black text-white mb-4">
-                    Kenapa Harus <span class="text-green-400">Percaya Sama Kami?</span>
+                    Mengapa Memilih <span class="text-blue-400">DARJO KU?</span>
                 </h2>
                 <p class="text-xl text-gray-300 max-w-2xl mx-auto">
-                    Karena ini dibuat <span class="text-green-400 font-semibold">OLEH warga</span>, <span class="text-green-400 font-semibold">UNTUK warga</span> Sidoarjo
+                    Platform yang dibuat <span class="text-blue-400 font-semibold">khusus untuk warga Sidoarjo</span>, dengan fokus pada kebutuhan lokal.
                 </p>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
                 <!-- Card 1 -->
-                <div class="bg-gray-800 border border-green-500/30 rounded-2xl p-6 text-center card-hover">
-                    <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-bolt text-2xl text-green-400"></i>
+                <div class="bg-gray-800 border border-blue-500/30 rounded-2xl p-6 text-center card-hover">
+                    <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-bolt text-2xl text-blue-400"></i>
                     </div>
-                    <h3 class="text-xl font-black text-white mb-3">Cepet & Simpel</h3>
+                    <h3 class="text-xl font-black text-white mb-3">Fokus Lokal</h3>
                     <p class="text-gray-400">
-                        Gak perlu ribet, semua fitur bisa diakses dengan beberapa klik doang.
+                        Semua konten dan layanan dikhususkan untuk kebutuhan warga Sidoarjo.
                     </p>
                 </div>
                 
                 <!-- Card 2 -->
-                <div class="bg-gray-800 border border-green-500/30 rounded-2xl p-6 text-center card-hover">
-                    <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-shield-alt text-2xl text-green-400"></i>
+                <div class="bg-gray-800 border border-blue-500/30 rounded-2xl p-6 text-center card-hover">
+                    <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shield-alt text-2xl text-blue-400"></i>
                     </div>
-                    <h3 class="text-xl font-black text-white mb-3">Aman & Terpercaya</h3>
+                    <h3 class="text-xl font-black text-white mb-3">Terpercaya</h3>
                     <p class="text-gray-400">
-                        Data lu aman, gak dijual ke pihak ketiga. Janji!
+                        Informasi diverifikasi langsung oleh tim lokal yang memahami kondisi Sidoarjo.
                     </p>
                 </div>
                 
                 <!-- Card 3 -->
-                <div class="bg-gray-800 border border-green-500/30 rounded-2xl p-6 text-center card-hover">
-                    <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-rocket text-2xl text-green-400"></i>
+                <div class="bg-gray-800 border border-blue-500/30 rounded-2xl p-6 text-center card-hover">
+                    <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-users text-2xl text-blue-400"></i>
                     </div>
-                    <h3 class="text-xl font-black text-white mb-3">Terus Update</h3>
+                    <h3 class="text-xl font-black text-white mb-3">Komunitas</h3>
                     <p class="text-gray-400">
-                        Fitur baru selalu ditambahin berdasarkan masukan dari warga.
+                        Dikelola bersama oleh komunitas warga Sidoarjo untuk kepentingan bersama.
                     </p>
                 </div>
             </div>
@@ -362,19 +377,19 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-16 px-6 bg-gradient-to-r from-green-600 to-emerald-700">
+    <section class="py-16 px-6 bg-gradient-to-r from-blue-600 to-indigo-700">
         <div class="max-w-4xl mx-auto text-center">
             <h2 class="text-3xl md:text-4xl font-black text-white mb-4">
-                Yaudah, Buruan Join!
+                Bergabunglah dengan DARJO KU Sekarang!
             </h2>
-            <p class="text-xl text-green-100 mb-8 max-w-2xl mx-auto">
-                Gratis kok. Gak ada biaya tersembunyi. Beneran!
+            <p class="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+                Jadilah bagian dari komunitas warga Sidoarjo yang saling terhubung dan saling mendukung.
             </p>
-            <button class="bg-black hover:bg-gray-800 text-white font-bold py-4 px-10 rounded-full text-lg shadow-2xl transition-all transform hover:scale-105 mb-6">
+            <button class="bg-white text-blue-600 hover:bg-blue-50 font-bold py-4 px-10 rounded-full text-lg shadow-2xl transition-all transform hover:scale-105 mb-6">
                 DAFTAR SEKARANG
             </button>
-            <p class="text-green-200">
-                Udah <span class="font-bold">2,000+ warga</span> yang gabung
+            <p class="text-blue-200">
+                Sudah <span class="font-bold">3,500+ warga Sidoarjo</span> yang bergabung
             </p>
         </div>
     </section>
@@ -384,21 +399,34 @@
         <div class="max-w-7xl mx-auto text-center">
             <!-- Logo & Brand -->
             <div class="flex items-center justify-center space-x-3 mb-6">
-                <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-leaf text-white"></i>
+                <div class="logo-glow w-12 h-12 rounded-lg flex items-center justify-center">
+                    <!-- Placeholder untuk logo DARJO KU -->
+                    <img src="foto/logo.png" alt="DARJO KU" class="h-10">
                 </div>
                 <div class="text-2xl font-black">
-                    <span>SIDO</span>
-                    <span class="text-green-400">KITA</span>
+                    <span>DARJO</span>
+                    <span class="text-blue-400">KU</span>
                 </div>
             </div>
             
             <p class="text-gray-400 mb-6">
-                Dibuat dengan <i class="fas fa-heart text-red-400"></i> di Sidoarjo
+                Platform Komunitas Warga Sidoarjo
             </p>
             
+            <div class="flex justify-center space-x-6 mb-6">
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fab fa-facebook text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fab fa-instagram text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fab fa-whatsapp text-xl"></i>
+                </a>
+            </div>
+            
             <p class="text-gray-500">
-                © 2025 SidoKita • Email: <a href="mailto:halo@sidokita.id" class="text-green-400 hover:text-green-300">halo@sidokita.id</a>
+                © 2025 DARJO KU • Email: <a href="mailto:info@darjoku.id" class="text-blue-400 hover:text-blue-300">info@darjoku.id</a>
             </p>
         </div>
     </footer>
