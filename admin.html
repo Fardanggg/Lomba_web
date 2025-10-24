@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - DARJO KU</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .sidebar {
+            transition: all 0.3s;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Sidebar -->
+    <div class="sidebar fixed inset-y-0 left-0 z-50 w-64 bg-blue-800 text-white">
+        <div class="flex items-center justify-center h-16 bg-blue-900">
+            <div class="text-xl font-bold">DARJO KU Admin</div>
+        </div>
+        <nav class="mt-8">
+            <a href="#dashboard" class="block py-3 px-6 bg-blue-700 border-l-4 border-white">
+                <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
+            </a>
+            <a href="#destinations" class="block py-3 px-6 hover:bg-blue-700 border-l-4 border-transparent hover:border-white">
+                <i class="fas fa-map-marker-alt mr-3"></i>Destinasi
+            </a>
+            <a href="#foods" class="block py-3 px-6 hover:bg-blue-700 border-l-4 border-transparent hover:border-white">
+                <i class="fas fa-utensils mr-3"></i>Kuliner
+            </a>
+            <a href="#events" class="block py-3 px-6 hover:bg-blue-700 border-l-4 border-transparent hover:border-white">
+                <i class="fas fa-calendar-alt mr-3"></i>Acara
+            </a>
+            <a href="#users" class="block py-3 px-6 hover:bg-blue-700 border-l-4 border-transparent hover:border-white">
+                <i class="fas fa-users mr-3"></i>Pengguna
+            </a>
+            <a href="index.html" class="block py-3 px-6 hover:bg-blue-700 border-l-4 border-transparent hover:border-white">
+                <i class="fas fa-home mr-3"></i>Kembali ke Website
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="md:ml-64">
+        <!-- Top Bar -->
+        <header class="bg-white shadow">
+            <div class="flex items-center justify-between px-6 py-4">
+                <div class="flex items-center">
+                    <button id="sidebar-toggle" class="md:hidden text-gray-500 focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <h1 class="text-xl font-semibold text-gray-800 ml-4 md:ml-0" id="page-title">Dashboard</h1>
+                </div>
+                <div class="flex items-center">
+                    <div class="relative">
+                        <div class="flex items-center space-x-4">
+                            <div class="text-right">
+                                <div class="font-medium">Admin User</div>
+                                <div class="text-sm text-gray-500">Administrator</div>
+                            </div>
+                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                                A
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <main class="p-6">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Dashboard</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-blue-100 text-blue-500 mr-4">
+                                    <i class="fas fa-map-marker-alt text-xl"></i>
+                                </div>
+                                <div>
+                                    <div class="text-2xl font-bold" id="stats-destinations">0</div>
+                                    <div class="text-gray-500">Destinasi Wisata</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-green-100 text-green-500 mr-4">
+                                    <i class="fas fa-utensils text-xl"></i>
+                                </div>
+                                <div>
+                                    <div class="text-2xl font-bold" id="stats-foods">0</div>
+                                    <div class="text-gray-500">Kuliner Khas</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-purple-100 text-purple-500 mr-4">
+                                    <i class="fas fa-calendar-alt text-xl"></i>
+                                </div>
+                                <div>
+                                    <div class="text-2xl font-bold" id="stats-events">0</div>
+                                    <div class="text-gray-500">Acara & Event</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-yellow-100 text-yellow-500 mr-4">
+                                    <i class="fas fa-users text-xl"></i>
+                                </div>
+                                <div>
+                                    <div class="text-2xl font-bold" id="stats-users">0</div>
+                                    <div class="text-gray-500">Total Pengguna</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="p-4 border-b">
+                            <h3 class="text-lg font-semibold">Destinasi Terbaru</h3>
+                        </div>
+                        <div class="p-4">
+                            <div id="recent-destinations">
+                                <!-- Recent destinations will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="p-4 border-b">
+                            <h3 class="text-lg font-semibold">Kuliner Terbaru</h3>
+                        </div>
+                        <div class="p-4">
+                            <div id="recent-foods">
+                                <!-- Recent foods will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Destinations Section -->
+            <section id="destinations" class="content-section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Kelola Destinasi Wisata</h2>
+                    <button id="add-destination-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+                        <i class="fas fa-plus mr-2"></i>Tambah Destinasi
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="p-4 border-b">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                            <div class="mb-4 md:mb-0">
+                                <input type="text" id="search-destinations" placeholder="Cari destinasi..." class="px-4 py-2 border rounded-lg w-full md:w-64">
+                            </div>
+                            <div class="flex space-x-2">
+                                <select id="category-filter" class="px-4 py-2 border rounded-lg">
+                                    <option value="all">Semua Kategori</option>
+                                    <option value="wisata-alam">Wisata Alam</option>
+                                    <option value="wisata-sejarah">Wisata Sejarah</option>
+                                    <option value="wisata-keluarga">Wisata Keluarga</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ulasan</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="destinations-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Destinations will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Foods Section -->
+            <section id="foods" class="content-section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Kelola Kuliner</h2>
+                    <button id="add-food-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+                        <i class="fas fa-plus mr-2"></i>Tambah Kuliner
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="p-4 border-b">
+                        <input type="text" id="search-foods" placeholder="Cari kuliner..." class="px-4 py-2 border rounded-lg w-full md:w-64">
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="foods-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Foods will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Events Section -->
+            <section id="events" class="content-section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Kelola Acara & Event</h2>
+                    <button id="add-event-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+                        <i class="fas fa-plus mr-2"></i>Tambah Acara
+                    </button>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="p-4 border-b">
+                        <input type="text" id="search-events" placeholder="Cari acara..." class="px-4 py-2 border rounded-lg w-full md:w-64">
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="events-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Events will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Users Section -->
+            <section id="users" class="content-section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Kelola Pengguna</h2>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="p-4 border-b">
+                        <input type="text" id="search-users" placeholder="Cari pengguna..." class="px-4 py-2 border rounded-lg w-full md:w-64">
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Users will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal for adding/editing items -->
+    <div id="modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex justify-between items-center pb-3 border-b">
+                    <h3 class="text-xl font-semibold" id="modal-title">Tambah Data</h3>
+                    <button id="modal-close" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="mt-4">
+                    <form id="modal-form">
+                        <!-- Form content will be dynamically generated -->
+                    </form>
+                </div>
+                <div class="flex justify-end space-x-3 mt-6 pt-3 border-t">
+                    <button id="modal-cancel" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Batal</button>
+                    <button id="modal-save" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://swnmxpknfxcolfohexup.supabase.co'; // Ganti dengan URL Supabase Anda
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bm14cGtuZnhjb2xmb2hleHVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyOTc1NDEsImV4cCI6MjA3Njg3MzU0MX0.V0pZMXn-EXUZlKcilT-ZZXbIWLFCEfHDDik7qWUDeWk'; // Ganti dengan anon key Anda
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Current state
+        let currentSection = 'dashboard';
+        let currentEditingId = null;
+        let currentEditingType = null;
+
+        // DOM elements
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const contentSections = document.querySelectorAll('.content-section');
+        const navLinks = document.querySelectorAll('nav a');
+        const pageTitle = document.getElementById('page-title');
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalForm = document.getElementById('modal-form');
+        const modalClose = document.getElementById('modal-close');
+        const modalCancel = document.getElementById('modal-cancel');
+        const modalSave = document.getElementById('modal-save');
+
+        // Initialize the admin panel
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load dashboard data
+            loadDashboardData();
+            
+            // Set up event listeners
+            setupEventListeners();
+        });
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Sidebar toggle for mobile
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+            });
+
+            // Navigation links
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = this.getAttribute('href').substring(1);
+                    showSection(target);
+                    
+                    // Update active nav link
+                    navLinks.forEach(l => {
+                        l.classList.remove('bg-blue-700', 'border-white');
+                        l.classList.add('border-transparent');
+                    });
+                    this.classList.add('bg-blue-700', 'border-white');
+                    this.classList.remove('border-transparent');
+                });
+            });
+
+            // Modal events
+            modalClose.addEventListener('click', closeModal);
+            modalCancel.addEventListener('click', closeModal);
+            modalSave.addEventListener('click', saveItem);
+
+            // Add buttons
+            document.getElementById('add-destination-btn').addEventListener('click', () => openAddModal('destination'));
+            document.getElementById('add-food-btn').addEventListener('click', () => openAddModal('food'));
+            document.getElementById('add-event-btn').addEventListener('click', () => openAddModal('event'));
+
+            // Search functionality
+            document.getElementById('search-destinations').addEventListener('input', filterDestinations);
+            document.getElementById('search-foods').addEventListener('input', filterFoods);
+            document.getElementById('search-events').addEventListener('input', filterEvents);
+            document.getElementById('search-users').addEventListener('input', filterUsers);
+            document.getElementById('category-filter').addEventListener('change', filterDestinations);
+        }
+
+        // Show a specific section
+        function showSection(section) {
+            // Hide all sections
+            contentSections.forEach(s => s.classList.add('hidden'));
+            
+            // Show the selected section
+            document.getElementById(section).classList.remove('hidden');
+            
+            // Update page title
+            pageTitle.textContent = getSectionTitle(section);
+            
+            // Load section data if needed
+            if (section === 'destinations') {
+                loadDestinations();
+            } else if (section === 'foods') {
+                loadFoods();
+            } else if (section === 'events') {
+                loadEvents();
+            } else if (section === 'users') {
+                loadUsers();
+            }
+            
+            currentSection = section;
+        }
+
+        // Get section title
+        function getSectionTitle(section) {
+            const titles = {
+                'dashboard': 'Dashboard',
+                'destinations': 'Kelola Destinasi',
+                'foods': 'Kelola Kuliner',
+                'events': 'Kelola Acara',
+                'users': 'Kelola Pengguna'
+            };
+            return titles[section] || 'Dashboard';
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                // Load stats
+                const { data: destinations, count: destCount } = await supabase
+                    .from('destinations')
+                    .select('*', { count: 'exact', head: true });
+                
+                const { data: foods, count: foodCount } = await supabase
+                    .from('foods')
+                    .select('*', { count: 'exact', head: true });
+                
+                const { data: events, count: eventCount } = await supabase
+                    .from('events')
+                    .select('*', { count: 'exact', head: true });
+                
+                // Update stats
+                document.getElementById('stats-destinations').textContent = destCount || 0;
+                document.getElementById('stats-foods').textContent = foodCount || 0;
+                document.getElementById('stats-events').textContent = eventCount || 0;
+                document.getElementById('stats-users').textContent = '3500+'; // Placeholder
+                
+                // Load recent items
+                const { data: recentDestinations } = await supabase
+                    .from('destinations')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+                
+                const { data: recentFoods } = await supabase
+                    .from('foods')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+                
+                // Display recent items
+                displayRecentDestinations(recentDestinations || []);
+                displayRecentFoods(recentFoods || []);
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        // Load destinations for management
+        async function loadDestinations() {
+            try {
+                const { data: destinations, error } = await supabase
+                    .from('destinations')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (!error) {
+                    displayDestinationsTable(destinations || []);
+                } else {
+                    console.error('Error loading destinations:', error);
+                }
+            } catch (error) {
+                console.error('Error loading destinations:', error);
+            }
+        }
+
+        // Load foods for management
+        async function loadFoods() {
+            try {
+                const { data: foods, error } = await supabase
+                    .from('foods')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (!error) {
+                    displayFoodsTable(foods || []);
+                } else {
+                    console.error('Error loading foods:', error);
+                }
+            } catch (error) {
+                console.error('Error loading foods:', error);
+            }
+        }
+
+        // Load events for management
+        async function loadEvents() {
+            try {
+                const { data: events, error } = await supabase
+                    .from('events')
+                    .select('*')
+                    .order('event_date', { ascending: true });
+                
+                if (!error) {
+                    displayEventsTable(events || []);
+                } else {
+                    console.error('Error loading events:', error);
+                }
+            } catch (error) {
+                console.error('Error loading events:', error);
+            }
+        }
+
+        // Load users for management
+        async function loadUsers() {
+            try {
+                // This would typically come from your authentication system
+                // For now, we'll use placeholder data
+                const users = [
+                    { id: 1, name: 'Ahmad Wijaya', email: 'ahmad@example.com', status: 'Aktif' },
+                    { id: 2, name: 'Siti Nurhaliza', email: 'siti@example.com', status: 'Aktif' },
+                    { id: 3, name: 'Budi Santoso', email: 'budi@example.com', status: 'Nonaktif' }
+                ];
+                
+                displayUsersTable(users);
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        // Display recent destinations
+        function displayRecentDestinations(destinations) {
+            const container = document.getElementById('recent-destinations');
+            container.innerHTML = '';
+            
+            if (destinations.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">Tidak ada destinasi terbaru</p>';
+                return;
+            }
+            
+            destinations.forEach(destination => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center py-3 border-b last:border-b-0';
+                
+                item.innerHTML = `
+                    <div class="w-12 h-12 bg-cover bg-center rounded-lg mr-4" style="background-image: url('${destination.image_url}')"></div>
+                    <div class="flex-1">
+                        <div class="font-medium">${destination.name}</div>
+                        <div class="text-sm text-gray-500">${destination.category}</div>
+                    </div>
+                    <div class="text-sm text-gray-500">${formatDate(destination.created_at)}</div>
+                `;
+                
+                container.appendChild(item);
+            });
+        }
+
+        // Display recent foods
+        function displayRecentFoods(foods) {
+            const container = document.getElementById('recent-foods');
+            container.innerHTML = '';
+            
+            if (foods.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">Tidak ada kuliner terbaru</p>';
+                return;
+            }
+            
+            foods.forEach(food => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center py-3 border-b last:border-b-0';
+                
+                item.innerHTML = `
+                    <div class="w-12 h-12 bg-cover bg-center rounded-lg mr-4" style="background-image: url('${food.image_url}')"></div>
+                    <div class="flex-1">
+                        <div class="font-medium">${food.name}</div>
+                        <div class="text-sm text-gray-500">Rp ${food.price.toLocaleString()}</div>
+                    </div>
+                    <div class="text-sm text-gray-500">${formatDate(food.created_at)}</div>
+                `;
+                
+                container.appendChild(item);
+            });
+        }
+
+        // Display destinations table
+        function displayDestinationsTable(destinations) {
+            const container = document.getElementById('destinations-table-body');
+            container.innerHTML = '';
+            
+            if (destinations.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">Tidak ada destinasi</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            destinations.forEach(destination => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <div class="h-10 w-10 rounded-full bg-cover bg-center" style="background-image: url('${destination.image_url}')"></div>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${destination.name}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${getCategoryName(destination.category)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${destination.rating}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${destination.review_count}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button class="text-blue-600 hover:text-blue-900 mr-3 edit-btn" data-id="${destination.id}" data-type="destination">Edit</button>
+                        <button class="text-red-600 hover:text-red-900 delete-btn" data-id="${destination.id}" data-type="destination">Hapus</button>
+                    </td>
+                `;
+                
+                container.appendChild(row);
+            });
+            
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const type = this.getAttribute('data-type');
+                    openEditModal(id, type);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const type = this.getAttribute('data-type');
+                    deleteItem(id, type);
+                });
+            });
+        }
+
+        // Display foods table
+        function displayFoodsTable(foods) {
+            const container = document.getElementById('foods-table-body');
+            container.innerHTML = '';
+            
+            if (foods.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">Tidak ada kuliner</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            foods.forEach(food => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <div class="h-10 w-10 rounded-full bg-cover bg-center" style="background-image: url('${food.image_url}')"></div>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${food.name}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">Rp ${food.price.toLocaleString()}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${food.rating}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button class="text-blue-600 hover:text-blue-900 mr-3 edit-btn" data-id="${food.id}" data-type="food">Edit</button>
+                        <button class="text-red-600 hover:text-red-900 delete-btn" data-id="${food.id}" data-type="food">Hapus</button>
+                    </td>
+                `;
+                
+                container.appendChild(row);
+            });
+            
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const type = this.getAttribute('data-type');
+                    openEditModal(id, type);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const type = this.getAttribute('data-type');
+                    deleteItem(id, type);
+                });
+            });
+        }
+
+        // Display events table
+        function displayEventsTable(events) {
+            const container = document.getElementById('events-table-body');
+            container.innerHTML = '';
+            
+            if (events.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">Tidak ada acara</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            events.forEach(event => {
+                const row = document.createElement('tr');
+                const eventDate = new Date(event.event_date);
+                const formattedDate = eventDate.toLocaleDateString('id-ID', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                <div class="h-10 w-10 rounded-full bg-cover bg-center" style="background-image: url('${event.image_url}')"></div>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${event.name}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${formattedDate}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${event.location}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button class="text-blue-600 hover:text-blue-900 mr-3 edit-btn" data-id="${event.id}" data-type="event">Edit</button>
+                        <button class="text-red-600 hover:text-red-900 delete-btn" data-id="${event.id}" data-type="event">Hapus</button>
+                    </td>
+                `;
+                
+                container.appendChild(row);
+            });
+            
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const type = this.getAttribute('data-type');
+                    openEditModal(id, type);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const type = this.getAttribute('data-type');
+                    deleteItem(id, type);
+                });
+            });
+        }
+
+        // Display users table
+        function displayUsersTable(users) {
+            const container = document.getElementById('users-table-body');
+            container.innerHTML = '';
+            
+            if (users.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">Tidak ada pengguna</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${user.name}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${user.email}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'Aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${user.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button class="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
+                        <button class="text-red-600 hover:text-red-900">Hapus</button>
+                    </td>
+                `;
+                
+                container.appendChild(row);
+            });
+        }
+
+        // Get category name
+        function getCategoryName(category) {
+            const categories = {
+                'wisata-alam': 'Wisata Alam',
+                'wisata-sejarah': 'Wisata Sejarah',
+                'wisata-keluarga': 'Wisata Keluarga'
+            };
+            return categories[category] || category;
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('id-ID', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        // Open add modal
+        function openAddModal(type) {
+            currentEditingId = null;
+            currentEditingType = type;
+            
+            let title = '';
+            let formHTML = '';
+            
+            if (type === 'destination') {
+                title = 'Tambah Destinasi Wisata';
+                formHTML = `
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Nama Destinasi</label>
+                        <input type="text" id="name" name="name" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Deskripsi</label>
+                        <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="category">Kategori</label>
+                        <select id="category" name="category" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <option value="wisata-alam">Wisata Alam</option>
+                            <option value="wisata-sejarah">Wisata Sejarah</option>
+                            <option value="wisata-keluarga">Wisata Keluarga</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="image_url">URL Gambar</label>
+                        <input type="url" id="image_url" name="image_url" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="rating">Rating</label>
+                            <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="review_count">Jumlah Ulasan</label>
+                            <input type="number" id="review_count" name="review_count" min="0" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'food') {
+                title = 'Tambah Kuliner';
+                formHTML = `
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Nama Kuliner</label>
+                        <input type="text" id="name" name="name" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Deskripsi</label>
+                        <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="image_url">URL Gambar</label>
+                        <input type="url" id="image_url" name="image_url" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="price">Harga (Rp)</label>
+                            <input type="number" id="price" name="price" min="0" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="rating">Rating</label>
+                            <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'event') {
+                title = 'Tambah Acara';
+                formHTML = `
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Nama Acara</label>
+                        <input type="text" id="name" name="name" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Deskripsi</label>
+                        <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="image_url">URL Gambar</label>
+                        <input type="url" id="image_url" name="image_url" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="event_date">Tanggal Acara</label>
+                        <input type="date" id="event_date" name="event_date" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="location">Lokasi</label>
+                        <input type="text" id="location" name="location" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                `;
+            }
+            
+            modalTitle.textContent = title;
+            modalForm.innerHTML = formHTML;
+            modal.classList.remove('hidden');
+        }
+
+        // Open edit modal
+        async function openEditModal(id, type) {
+            currentEditingId = id;
+            currentEditingType = type;
+            
+            try {
+                let item = null;
+                
+                if (type === 'destination') {
+                    const { data, error } = await supabase
+                        .from('destinations')
+                        .select('*')
+                        .eq('id', id)
+                        .single();
+                    
+                    if (!error) item = data;
+                } else if (type === 'food') {
+                    const { data, error } = await supabase
+                        .from('foods')
+                        .select('*')
+                        .eq('id', id)
+                        .single();
+                    
+                    if (!error) item = data;
+                } else if (type === 'event') {
+                    const { data, error } = await supabase
+                        .from('events')
+                        .select('*')
+                        .eq('id', id)
+                        .single();
+                    
+                    if (!error) item = data;
+                }
+                
+                if (!item) {
+                    alert('Data tidak ditemukan');
+                    return;
+                }
+                
+                let title = '';
+                let formHTML = '';
+                
+                if (type === 'destination') {
+                    title = 'Edit Destinasi Wisata';
+                    formHTML = `
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Nama Destinasi</label>
+                            <input type="text" id="name" name="name" value="${item.name}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Deskripsi</label>
+                            <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>${item.description}</textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="category">Kategori</label>
+                            <select id="category" name="category" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                <option value="wisata-alam" ${item.category === 'wisata-alam' ? 'selected' : ''}>Wisata Alam</option>
+                                <option value="wisata-sejarah" ${item.category === 'wisata-sejarah' ? 'selected' : ''}>Wisata Sejarah</option>
+                                <option value="wisata-keluarga" ${item.category === 'wisata-keluarga' ? 'selected' : ''}>Wisata Keluarga</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="image_url">URL Gambar</label>
+                            <input type="url" id="image_url" name="image_url" value="${item.image_url}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="rating">Rating</label>
+                                <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" value="${item.rating}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="review_count">Jumlah Ulasan</label>
+                                <input type="number" id="review_count" name="review_count" min="0" value="${item.review_count}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                        </div>
+                    `;
+                } else if (type === 'food') {
+                    title = 'Edit Kuliner';
+                    formHTML = `
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Nama Kuliner</label>
+                            <input type="text" id="name" name="name" value="${item.name}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Deskripsi</label>
+                            <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>${item.description}</textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="image_url">URL Gambar</label>
+                            <input type="url" id="image_url" name="image_url" value="${item.image_url}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="price">Harga (Rp)</label>
+                                <input type="number" id="price" name="price" min="0" value="${item.price}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="rating">Rating</label>
+                                <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" value="${item.rating}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                        </div>
+                    `;
+                } else if (type === 'event') {
+                    // Format date for input
+                    const eventDate = new Date(item.event_date);
+                    const formattedDate = eventDate.toISOString().split('T')[0];
+                    
+                    title = 'Edit Acara';
+                    formHTML = `
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Nama Acara</label>
+                            <input type="text" id="name" name="name" value="${item.name}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Deskripsi</label>
+                            <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>${item.description}</textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="image_url">URL Gambar</label>
+                            <input type="url" id="image_url" name="image_url" value="${item.image_url}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="event_date">Tanggal Acara</label>
+                            <input type="date" id="event_date" name="event_date" value="${formattedDate}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="location">Lokasi</label>
+                            <input type="text" id="location" name="location" value="${item.location}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                    `;
+                }
+                
+                modalTitle.textContent = title;
+                modalForm.innerHTML = formHTML;
+                modal.classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('Error loading item for edit:', error);
+                alert('Terjadi kesalahan saat memuat data');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            modal.classList.add('hidden');
+            currentEditingId = null;
+            currentEditingType = null;
+        }
+
+        // Save item
+        async function saveItem() {
+            const formData = new FormData(modalForm);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Convert numeric fields
+            if (data.rating) data.rating = parseFloat(data.rating);
+            if (data.review_count) data.review_count = parseInt(data.review_count);
+            if (data.price) data.price = parseInt(data.price);
+            
+            try {
+                let result;
+                
+                if (currentEditingId) {
+                    // Update existing item
+                    if (currentEditingType === 'destination') {
+                        result = await supabase
+                            .from('destinations')
+                            .update(data)
+                            .eq('id', currentEditingId);
+                    } else if (currentEditingType === 'food') {
+                        result = await supabase
+                            .from('foods')
+                            .update(data)
+                            .eq('id', currentEditingId);
+                    } else if (currentEditingType === 'event') {
+                        result = await supabase
+                            .from('events')
+                            .update(data)
+                            .eq('id', currentEditingId);
+                    }
+                } else {
+                    // Add new item
+                    if (currentEditingType === 'destination') {
+                        result = await supabase
+                            .from('destinations')
+                            .insert([data]);
+                    } else if (currentEditingType === 'food') {
+                        result = await supabase
+                            .from('foods')
+                            .insert([data]);
+                    } else if (currentEditingType === 'event') {
+                        result = await supabase
+                            .from('events')
+                            .insert([data]);
+                    }
+                }
+                
+                if (result.error) {
+                    throw result.error;
+                }
+                
+                alert(currentEditingId ? 'Data berhasil diperbarui' : 'Data berhasil ditambahkan');
+                closeModal();
+                
+                // Reload the current section
+                if (currentSection === 'dashboard') {
+                    loadDashboardData();
+                } else if (currentSection === 'destinations') {
+                    loadDestinations();
+                } else if (currentSection === 'foods') {
+                    loadFoods();
+                } else if (currentSection === 'events') {
+                    loadEvents();
+                }
+                
+            } catch (error) {
+                console.error('Error saving item:', error);
+                alert('Terjadi kesalahan saat menyimpan data');
+            }
+        }
+
+        // Delete item
+        async function deleteItem(id, type) {
+            if (!confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+                return;
+            }
+            
+            try {
+                let result;
+                
+                if (type === 'destination') {
+                    result = await supabase
+                        .from('destinations')
+                        .delete()
+                        .eq('id', id);
+                } else if (type === 'food') {
+                    result = await supabase
+                        .from('foods')
+                        .delete()
+                        .eq('id', id);
+                } else if (type === 'event') {
+                    result = await supabase
+                        .from('events')
+                        .delete()
+                        .eq('id', id);
+                }
+                
+                if (result.error) {
+                    throw result.error;
+                }
+                
+                alert('Data berhasil dihapus');
+                
+                // Reload the current section
+                if (currentSection === 'dashboard') {
+                    loadDashboardData();
+                } else if (currentSection === 'destinations') {
+                    loadDestinations();
+                } else if (currentSection === 'foods') {
+                    loadFoods();
+                } else if (currentSection === 'events') {
+                    loadEvents();
+                }
+                
+            } catch (error) {
+                console.error('Error deleting item:', error);
+                alert('Terjadi kesalahan saat menghapus data');
+            }
+        }
+
+        // Filter functions
+        function filterDestinations() {
+            const searchTerm = document.getElementById('search-destinations').value.toLowerCase();
+            const categoryFilter = document.getElementById('category-filter').value;
+            const rows = document.querySelectorAll('#destinations-table-body tr');
+            
+            rows.forEach(row => {
+                const name = row.querySelector('td:first-child div div:first-child').textContent.toLowerCase();
+                const category = row.querySelector('td:nth-child(2) div').textContent.toLowerCase();
+                
+                const matchesSearch = name.includes(searchTerm);
+                const matchesCategory = categoryFilter === 'all' || category.includes(categoryFilter);
+                
+                row.style.display = matchesSearch && matchesCategory ? '' : 'none';
+            });
+        }
+
+        function filterFoods() {
+            const searchTerm = document.getElementById('search-foods').value.toLowerCase();
+            const rows = document.querySelectorAll('#foods-table-body tr');
+            
+            rows.forEach(row => {
+                const name = row.querySelector('td:first-child div div:first-child').textContent.toLowerCase();
+                row.style.display = name.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        function filterEvents() {
+            const searchTerm = document.getElementById('search-events').value.toLowerCase();
+            const rows = document.querySelectorAll('#events-table-body tr');
+            
+            rows.forEach(row => {
+                const name = row.querySelector('td:first-child div div:first-child').textContent.toLowerCase();
+                row.style.display = name.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('search-users').value.toLowerCase();
+            const rows = document.querySelectorAll('#users-table-body tr');
+            
+            rows.forEach(row => {
+                const name = row.querySelector('td:first-child div').textContent.toLowerCase();
+                const email = row.querySelector('td:nth-child(2) div').textContent.toLowerCase();
+                
+                row.style.display = name.includes(searchTerm) || email.includes(searchTerm) ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>
