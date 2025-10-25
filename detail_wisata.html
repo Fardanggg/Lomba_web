@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Wisata - DARJO KU</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        * {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .destination-hero {
+            height: 60vh;
+            min-height: 500px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .hero-overlay {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+        }
+        
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 12px;
+            z-index: 1;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        
+        .gallery-item {
+            height: 200px;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        
+        .review-card {
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .star-rating {
+            color: #fbbf24;
+        }
+        
+        .distance-badge {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .tab-button {
+            padding: 12px 24px;
+            border: none;
+            background: none;
+            font-weight: 600;
+            color: #6b7280;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab-button.active {
+            color: #3b82f6;
+            border-bottom: 3px solid #3b82f6;
+        }
+        
+        .weather-card {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .floating-action {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #3b82f6;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+        
+        .info-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e5e7eb, transparent);
+            margin: 40px 0;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #3b82f6;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .review-form {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .star-input {
+            display: none;
+        }
+        
+        .star-label {
+            font-size: 24px;
+            color: #d1d5db;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .star-input:checked ~ .star-label,
+        .star-label:hover,
+        .star-label:hover ~ .star-label {
+            color: #fbbf24;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border-radius: 16px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 bg-white shadow-md py-4 px-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <a href="index.html" class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold">DK</span>
+                    </div>
+                    <div class="text-xl font-black">
+                        <span class="text-black">DARJO</span>
+                        <span class="text-blue-500">KU</span>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="index.html#destinasi" class="text-gray-700 hover:text-blue-600 font-medium">Destinasi</a>
+                <a href="index.html#kuliner" class="text-gray-700 hover:text-blue-600 font-medium">Kuliner</a>
+                <a href="index.html#acara" class="text-gray-700 hover:text-blue-600 font-medium">Acara</a>
+                <a href="index.html#tentang" class="text-gray-700 hover:text-blue-600 font-medium">Tentang</a>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <a href="index.html" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>Kembali
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="destination-hero" id="destination-hero">
+        <div class="hero-overlay absolute inset-0"></div>
+        <div class="relative z-10 h-full flex items-end">
+            <div class="max-w-7xl mx-auto w-full px-6 pb-12 text-white">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+                    <div>
+                        <div class="inline-flex items-center space-x-2 bg-black/30 backdrop-blur-sm px-3 py-1 rounded-full mb-4">
+                            <i class="fas fa-map-marker-alt text-blue-300"></i>
+                            <span class="text-sm font-medium" id="destination-location">Sidoarjo, Jawa Timur</span>
+                        </div>
+                        <h1 class="text-4xl md:text-5xl font-black mb-4" id="destination-name">Memuat...</h1>
+                        <p class="text-xl max-w-2xl mb-6" id="destination-description">Memuat deskripsi...</p>
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div class="flex items-center space-x-1" id="destination-rating">
+                                <div class="flex star-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                                <span class="font-semibold">4.0</span>
+                                <span class="text-blue-200">(280 ulasan)</span>
+                            </div>
+                            <div class="flex items-center space-x-1" id="destination-hours">
+                                <i class="far fa-clock"></i>
+                                <span>Buka 24 jam</span>
+                            </div>
+                            <div class="flex items-center space-x-1" id="destination-price">
+                                <i class="fas fa-tag"></i>
+                                <span>Gratis</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button id="share-btn" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-full transition-colors flex items-center justify-center gap-2">
+                            <i class="fas fa-share-alt"></i>
+                            <span>Bagikan</span>
+                        </button>
+                        <button id="save-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-full transition-colors flex items-center justify-center gap-2">
+                            <i class="far fa-bookmark"></i>
+                            <span>Simpan</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column - Main Content -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Tabs Navigation -->
+                <div class="bg-white rounded-2xl shadow-sm p-2 flex overflow-x-auto">
+                    <button class="tab-button active" data-tab="overview">
+                        <i class="fas fa-info-circle mr-2"></i>Overview
+                    </button>
+                    <button class="tab-button" data-tab="maps">
+                        <i class="fas fa-map-marked-alt mr-2"></i>Peta & Lokasi
+                    </button>
+                    <button class="tab-button" data-tab="gallery">
+                        <i class="fas fa-images mr-2"></i>Galeri
+                    </button>
+                    <button class="tab-button" data-tab="reviews">
+                        <i class="fas fa-star mr-2"></i>Ulasan
+                    </button>
+                    <button class="tab-button" data-tab="nearby">
+                        <i class="fas fa-location-arrow mr-2"></i>Dekat Sini
+                    </button>
+                </div>
+
+                <!-- Tab Contents -->
+                <div class="tab-content active" id="overview">
+                    <div class="info-card p-6">
+                        <h2 class="text-2xl font-bold mb-4" id="overview-title">Tentang Destinasi</h2>
+                        <p class="text-gray-700 mb-6" id="overview-description">
+                            Memuat deskripsi destinasi...
+                        </p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <h3 class="text-lg font-semibold mb-3">Fasilitas</h3>
+                                <ul class="space-y-2" id="facilities-list">
+                                    <!-- Facilities will be loaded here -->
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold mb-3">Aktivitas</h3>
+                                <ul class="space-y-2" id="activities-list">
+                                    <!-- Activities will be loaded here -->
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-4 rounded-xl">
+                            <h3 class="text-lg font-semibold mb-2 flex items-center">
+                                <i class="fas fa-lightbulb text-blue-500 mr-2"></i>
+                                Tips Berkunjung
+                            </h3>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1" id="tips-list">
+                                <!-- Tips will be loaded here -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="maps">
+                    <div class="info-card p-6">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                            <h2 class="text-2xl font-bold">Peta & Lokasi</h2>
+                            <div class="mt-2 md:mt-0">
+                                <div id="distance-info" class="distance-badge">
+                                    <i class="fas fa-road"></i>
+                                    <span>Mengukur jarak...</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="map" class="mb-6"></div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-lg font-semibold mb-3">Alamat Lengkap</h3>
+                                <p class="text-gray-700 mb-2" id="destination-address">
+                                    Memuat alamat...
+                                </p>
+                                <button id="directions-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition-colors flex items-center gap-2 mt-4">
+                                    <i class="fas fa-directions"></i>
+                                    <span>Dapatkan Petunjuk Arah</span>
+                                </button>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold mb-3">Transportasi</h3>
+                                <ul class="space-y-2" id="transportation-list">
+                                    <!-- Transportation will be loaded here -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="gallery">
+                    <div class="info-card p-6">
+                        <h2 class="text-2xl font-bold mb-6">Galeri Foto</h2>
+                        <div id="gallery-container" class="gallery-grid">
+                            <!-- Gallery items will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="reviews">
+                    <div class="info-card p-6">
+                        <h2 class="text-2xl font-bold mb-6">Ulasan Pengunjung</h2>
+                        
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 p-4 bg-blue-50 rounded-xl">
+                            <div class="mb-4 md:mb-0">
+                                <div class="flex items-center mb-2">
+                                    <div class="flex star-rating text-2xl mr-4" id="average-rating-stars">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </div>
+                                    <span class="text-2xl font-bold" id="average-rating">4.0</span>
+                                    <span class="text-gray-600 ml-2">/5.0</span>
+                                </div>
+                                <p class="text-gray-600" id="reviews-count">Berdasarkan 280 ulasan</p>
+                            </div>
+                            <button id="add-review-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition-colors flex items-center gap-2">
+                                <i class="fas fa-pen"></i>
+                                <span>Tulis Ulasan</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Review Form (Initially Hidden) -->
+                        <div id="review-form-container" class="review-form mb-8" style="display: none;">
+                            <h3 class="text-lg font-semibold mb-4">Tulis Ulasan Anda</h3>
+                            <form id="review-form">
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 mb-2">Rating</label>
+                                    <div class="flex space-x-1 mb-2">
+                                        <input type="radio" id="star5" name="rating" value="5" class="star-input">
+                                        <label for="star5" class="star-label">★</label>
+                                        <input type="radio" id="star4" name="rating" value="4" class="star-input">
+                                        <label for="star4" class="star-label">★</label>
+                                        <input type="radio" id="star3" name="rating" value="3" class="star-input">
+                                        <label for="star3" class="star-label">★</label>
+                                        <input type="radio" id="star2" name="rating" value="2" class="star-input">
+                                        <label for="star2" class="star-label">★</label>
+                                        <input type="radio" id="star1" name="rating" value="1" class="star-input">
+                                        <label for="star1" class="star-label">★</label>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="review-comment" class="block text-gray-700 mb-2">Komentar</label>
+                                    <textarea id="review-comment" name="comment" rows="4" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Bagikan pengalaman Anda..."></textarea>
+                                </div>
+                                <div class="flex justify-end space-x-3">
+                                    <button type="button" id="cancel-review-btn" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">Batal</button>
+                                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">Kirim Ulasan</button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div id="reviews-container" class="space-y-6">
+                            <!-- Reviews will be loaded here -->
+                        </div>
+                        
+                        <button id="load-more-reviews" class="w-full mt-6 py-3 border border-blue-500 text-blue-500 font-semibold rounded-full hover:bg-blue-50 transition-colors">
+                            Muat Lebih Banyak Ulasan
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="nearby">
+                    <div class="info-card p-6">
+                        <h2 class="text-2xl font-bold mb-6">Tempat Menarik Lainnya</h2>
+                        <div id="nearby-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Nearby places will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Sidebar -->
+            <div class="space-y-6">
+                <!-- Weather Card -->
+                <div class="weather-card p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg">Cuaca Sekarang</h3>
+                            <p class="text-blue-100">Sidoarjo</p>
+                        </div>
+                        <div class="text-3xl">
+                            <i class="fas fa-sun"></i>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="text-4xl font-bold" id="weather-temp">28°C</div>
+                        <div class="text-right">
+                            <p class="text-blue-100" id="weather-desc">Cerah Berawan</p>
+                            <p class="text-sm text-blue-200" id="weather-humidity">Kelembaban: 65%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Card -->
+                <div class="stats-card">
+                    <h3 class="font-bold text-lg mb-4">Statistik Kunjungan</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between">
+                            <span>Total Kunjungan</span>
+                            <span class="font-semibold" id="total-visits">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Kunjungan Bulan Ini</span>
+                            <span class="font-semibold" id="monthly-visits">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Rating Rata-rata</span>
+                            <span class="font-semibold" id="sidebar-rating">0.0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Card -->
+                <div class="info-card p-6">
+                    <h3 class="font-bold text-lg mb-4">Informasi Wisata</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Jam Operasional</span>
+                            <span class="font-semibold" id="operating-hours">24 Jam</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Tiket Masuk</span>
+                            <span class="font-semibold text-green-600" id="entry-fee">Gratis</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Estimasi Kunjungan</span>
+                            <span class="font-semibold" id="visit-duration">1-2 Jam</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Kategori</span>
+                            <span class="font-semibold" id="destination-category">Wisata Sejarah</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Card -->
+                <div class="info-card p-6">
+                    <h3 class="font-bold text-lg mb-4">Kontak</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <i class="fas fa-phone text-blue-500 mr-3"></i>
+                            <span class="text-gray-700" id="contact-phone">(031) 8965432</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-envelope text-blue-500 mr-3"></i>
+                            <span class="text-gray-700" id="contact-email">info@destinasi.sda</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-globe text-blue-500 mr-3"></i>
+                            <span class="text-gray-700" id="contact-website">www.destinasi.sda.go.id</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Popular Times Card -->
+                <div class="info-card p-6">
+                    <h3 class="font-bold text-lg mb-4">Waktu Kunjungan</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm text-gray-600">Pagi (06:00 - 12:00)</span>
+                                <span class="text-sm font-semibold">Ramai</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-yellow-500 h-2 rounded-full" style="width: 70%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm text-gray-600">Siang (12:00 - 18:00)</span>
+                                <span class="text-sm font-semibold">Sangat Ramai</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-red-500 h-2 rounded-full" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm text-gray-600">Malam (18:00 - 24:00)</span>
+                                <span class="text-sm font-semibold">Sepi</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 30%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Floating Action Buttons -->
+    <div class="floating-action">
+        <button id="location-btn" class="action-btn" title="Dapatkan Lokasi Saya">
+            <i class="fas fa-location-arrow"></i>
+        </button>
+        <button id="direction-btn" class="action-btn" title="Petunjuk Arah">
+            <i class="fas fa-directions"></i>
+        </button>
+        <button id="call-btn" class="action-btn" title="Hubungi">
+            <i class="fas fa-phone"></i>
+        </button>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="image-modal" class="modal">
+        <span class="modal-close">&times;</span>
+        <div class="modal-content">
+            <img id="modal-image" src="" alt="">
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 px-6 mt-12">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="flex items-center justify-center space-x-3 mb-6">
+                <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold">DK</span>
+                </div>
+                <div class="text-2xl font-black">
+                    <span>DARJO</span>
+                    <span class="text-blue-400">KU</span>
+                </div>
+            </div>
+            <p class="text-gray-400 mb-6">
+                Platform Wisata & Kuliner Sidoarjo Terpercaya
+            </p>
+            <div class="flex justify-center space-x-6 mb-6">
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fab fa-facebook text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fab fa-instagram text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fab fa-whatsapp text-xl"></i>
+                </a>
+            </div>
+            <p class="text-gray-500">
+                © 2025 DARJO KU • Platform Wisata & Kuliner Sidoarjo
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://swnmxpknfxcolfohexup.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bm14cGtuZnhjb2xmb2hleHVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyOTc1NDEsImV4cCI6MjA3Njg3MzU0MX0.V0pZMXn-EXUZlKcilT-ZZXbIWLFCEfHDDik7qWUDeWk';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Global variables
+        let map;
+        let userMarker;
+        let destinationMarker;
+        let currentDestinationId;
+        let currentReviews = [];
+        let reviewsOffset = 0;
+        const REVIEWS_PER_PAGE = 5;
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get destination ID from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            currentDestinationId = urlParams.get('id');
+            
+            if (!currentDestinationId) {
+                // Redirect to home if no ID provided
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Load destination data
+            loadDestinationData(currentDestinationId);
+            
+            // Initialize map
+            initMap();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Track page view
+            trackPageView(currentDestinationId);
+        });
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            // Tab switching
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs and contents
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to selected tab and content
+                    button.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    // If maps tab is selected, adjust map size
+                    if (tabId === 'maps') {
+                        setTimeout(() => {
+                            if (map) map.invalidateSize();
+                        }, 300);
+                    }
+                    
+                    // Load content for tabs that need dynamic data
+                    if (tabId === 'nearby') {
+                        loadNearbyDestinations();
+                    }
+                });
+            });
+            
+            // Review form
+            document.getElementById('add-review-btn').addEventListener('click', () => {
+                document.getElementById('review-form-container').style.display = 'block';
+            });
+            
+            document.getElementById('cancel-review-btn').addEventListener('click', () => {
+                document.getElementById('review-form-container').style.display = 'none';
+                document.getElementById('review-form').reset();
+            });
+            
+            document.getElementById('review-form').addEventListener('submit', submitReview);
+            
+            // Load more reviews
+            document.getElementById('load-more-reviews').addEventListener('click', loadMoreReviews);
+            
+            // Floating action buttons
+            document.getElementById('location-btn').addEventListener('click', getUserLocation);
+            document.getElementById('direction-btn').addEventListener('click', addRoute);
+            document.getElementById('call-btn').addEventListener('click', () => {
+                const phone = document.getElementById('contact-phone').textContent;
+                window.location.href = `tel:${phone}`;
+            });
+            
+            // Share button
+            document.getElementById('share-btn').addEventListener('click', shareDestination);
+            
+            // Save button
+            document.getElementById('save-btn').addEventListener('click', toggleFavorite);
+            
+            // Directions button
+            document.getElementById('directions-btn').addEventListener('click', addRoute);
+        }
+        
+        // Load destination data from Supabase
+        async function loadDestinationData(destinationId) {
+            try {
+                // Get destination details
+                const { data: destination, error } = await supabase
+                    .from('destinations')
+                    .select('*')
+                    .eq('id', destinationId)
+                    .single();
+                
+                if (error) {
+                    throw error;
+                }
+                
+                // Populate page with destination data
+                populateDestinationData(destination);
+                
+                // Load destination reviews
+                loadReviews(destinationId);
+                
+                // Load destination visits stats
+                loadVisitStats(destinationId);
+                
+                // Check if destination is in user's favorites
+                checkIfFavorite(destinationId);
+                
+            } catch (error) {
+                console.error('Error loading destination:', error);
+                alert('Terjadi kesalahan saat memuat data destinasi');
+            }
+        }
+        
+        // Populate page with destination data
+        function populateDestinationData(destination) {
+            // Hero section
+            document.getElementById('destination-hero').style.backgroundImage = `url('${destination.image_url}')`;
+            document.getElementById('destination-name').textContent = destination.name;
+            document.getElementById('destination-description').textContent = destination.description;
+            document.getElementById('destination-location').textContent = 'Sidoarjo, Jawa Timur';
+            
+            // Rating
+            updateRatingDisplay(destination.rating, destination.review_count);
+            
+            // Overview tab
+            document.getElementById('overview-title').textContent = `Tentang ${destination.name}`;
+            document.getElementById('overview-description').textContent = destination.description;
+            
+            // Facilities and activities
+            const facilitiesList = document.getElementById('facilities-list');
+            const activitiesList = document.getElementById('activities-list');
+            const tipsList = document.getElementById('tips-list');
+            
+            // These would typically come from the database
+            const facilities = ['Area Parkir Luas', 'Spot Foto Instagenik', 'Warung Makan Terdekat', 'Toilet Umum'];
+            const activities = ['Foto & Dokumentasi', 'Edukasi Sejarah', 'Jalan-jalan Santai', 'Wisata Keluarga'];
+            const tips = [
+                'Bawa kamera untuk mengabadikan momen di spot-spot foto yang menarik',
+                'Kunjungi pada pagi atau sore hari untuk menghindari panas terik',
+                'Pelajari sejarah destinasi sebelum berkunjung untuk pengalaman yang lebih bermakna',
+                'Gunakan pakaian yang nyaman karena area destinasi cukup terbuka'
+            ];
+            
+            facilities.forEach(facility => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center';
+                li.innerHTML = `<i class="fas fa-check text-green-500 mr-3"></i><span>${facility}</span>`;
+                facilitiesList.appendChild(li);
+            });
+            
+            activities.forEach(activity => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center';
+                li.innerHTML = `<i class="fas fa-check text-green-500 mr-3"></i><span>${activity}</span>`;
+                activitiesList.appendChild(li);
+            });
+            
+            tips.forEach(tip => {
+                const li = document.createElement('li');
+                li.textContent = tip;
+                tipsList.appendChild(li);
+            });
+            
+            // Maps tab
+            document.getElementById('destination-address').textContent = destination.address || 'Jl. Raya Porong, Kec. Porong, Kabupaten Sidoarjo, Jawa Timur';
+            
+            // Transportation
+            const transportationList = document.getElementById('transportation-list');
+            const transportOptions = [
+                { icon: 'bus', text: 'Bus: Angkutan Porong - Sidoarjo' },
+                { icon: 'motorcycle', text: 'Ojek Online: Tersedia' },
+                { icon: 'car', text: 'Parkir: Tersedia (Gratis)' }
+            ];
+            
+            transportOptions.forEach(transport => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center';
+                li.innerHTML = `<i class="fas fa-${transport.icon} text-blue-500 mr-3"></i><span>${transport.text}</span>`;
+                transportationList.appendChild(li);
+            });
+            
+            // Gallery tab
+            const galleryContainer = document.getElementById('gallery-container');
+            
+            // If you have multiple images in database, you would loop through them
+            // For now, we'll use the main image and some placeholder images
+            const galleryImages = [
+                destination.image_url,
+                'https://images.unsplash.com/photo-1597074861083-53dcc51af916?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+                'https://images.unsplash.com/photo-1551135049-8a33b5883817?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+                'https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'
+            ];
+            
+            galleryImages.forEach((imageUrl, index) => {
+                const galleryItem = document.createElement('div');
+                galleryItem.className = 'gallery-item';
+                galleryItem.innerHTML = `<img src="${imageUrl}" alt="${destination.name} - Foto ${index + 1}">`;
+                galleryContainer.appendChild(galleryItem);
+            });
+            
+            // Set up gallery modal
+            setupGalleryModal();
+            
+            // Sidebar information
+            document.getElementById('operating-hours').textContent = destination.operating_hours || '24 Jam';
+            document.getElementById('entry-fee').textContent = destination.entry_fee === 0 ? 'Gratis' : `Rp ${destination.entry_fee.toLocaleString()}`;
+            document.getElementById('visit-duration').textContent = destination.visit_duration || '1-2 Jam';
+            document.getElementById('destination-category').textContent = getCategoryName(destination.category);
+            document.getElementById('contact-phone').textContent = destination.contact_phone || '(031) 8965432';
+            document.getElementById('contact-email').textContent = destination.contact_email || 'info@destinasi.sda';
+            document.getElementById('contact-website').textContent = destination.website || 'www.destinasi.sda.go.id';
+            
+            // Update map with destination coordinates
+            if (destination.latitude && destination.longitude) {
+                updateMap([destination.latitude, destination.longitude]);
+            } else {
+                // Default coordinates for Sidoarjo
+                updateMap([-7.5309, 112.7049]);
+            }
+        }
+        
+        // Update rating display
+        function updateRatingDisplay(rating, reviewCount) {
+            const ratingElement = document.getElementById('destination-rating');
+            const averageRatingElement = document.getElementById('average-rating');
+            const averageRatingStars = document.getElementById('average-rating-stars');
+            const sidebarRating = document.getElementById('sidebar-rating');
+            const reviewsCountElement = document.getElementById('reviews-count');
+            
+            // Format rating to one decimal place
+            const formattedRating = parseFloat(rating).toFixed(1);
+            
+            // Update rating in various places
+            ratingElement.innerHTML = `
+                <div class="flex star-rating">
+                    ${generateStars(rating)}
+                </div>
+                <span class="font-semibold">${formattedRating}</span>
+                <span class="text-blue-200">(${reviewCount} ulasan)</span>
+            `;
+            
+            averageRatingElement.textContent = formattedRating;
+            averageRatingStars.innerHTML = generateStars(rating);
+            sidebarRating.textContent = formattedRating;
+            reviewsCountElement.textContent = `Berdasarkan ${reviewCount} ulasan`;
+        }
+        
+        // Generate star HTML based on rating
+        function generateStars(rating) {
+            let stars = '';
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+            
+            for (let i = 0; i < fullStars; i++) {
+                stars += '<i class="fas fa-star"></i>';
+            }
+            
+            if (hasHalfStar) {
+                stars += '<i class="fas fa-star-half-alt"></i>';
+            }
+            
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+            for (let i = 0; i < emptyStars; i++) {
+                stars += '<i class="far fa-star"></i>';
+            }
+            
+            return stars;
+        }
+        
+        // Get category name
+        function getCategoryName(category) {
+            const categories = {
+                'wisata-alam': 'Wisata Alam',
+                'wisata-sejarah': 'Wisata Sejarah',
+                'wisata-keluarga': 'Wisata Keluarga'
+            };
+            return categories[category] || category;
+        }
+        
+        // Initialize map
+        function initMap() {
+            // Default coordinates (Sidoarjo)
+            const defaultCoords = [-7.4478, 112.7183];
+            
+            // Initialize map
+            map = L.map('map').setView(defaultCoords, 13);
+            
+            // Add tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Try to get user location
+            getUserLocation();
+        }
+        
+        // Update map with destination coordinates
+        function updateMap(coords) {
+            // Remove existing destination marker
+            if (destinationMarker) {
+                map.removeLayer(destinationMarker);
+            }
+            
+            // Add destination marker
+            destinationMarker = L.marker(coords)
+                .addTo(map)
+                .bindPopup(document.getElementById('destination-name').textContent)
+                .openPopup();
+            
+            // If we have user location, calculate distance
+            if (userMarker) {
+                const userCoords = userMarker.getLatLng();
+                calculateDistance([userCoords.lat, userCoords.lng], coords);
+                
+                // Adjust map view to show both locations
+                const bounds = L.latLngBounds([userCoords, coords]);
+                map.fitBounds(bounds, { padding: [20, 20] });
+            } else {
+                // Just focus on destination
+                map.setView(coords, 15);
+            }
+        }
+        
+        // Get user location
+        function getUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const userCoords = [position.coords.latitude, position.coords.longitude];
+                        
+                        // Remove existing user marker
+                        if (userMarker) {
+                            map.removeLayer(userMarker);
+                        }
+                        
+                        // Add user marker
+                        userMarker = L.marker(userCoords, {
+                            icon: L.divIcon({
+                                className: 'user-location-marker',
+                                html: '<div style="background-color: #3b82f6; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>',
+                                iconSize: [20, 20],
+                                iconAnchor: [10, 10]
+                            })
+                        }).addTo(map)
+                        .bindPopup('Lokasi Anda')
+                        .openPopup();
+                        
+                        // Calculate distance if we have destination coordinates
+                        if (destinationMarker) {
+                            const destCoords = destinationMarker.getLatLng();
+                            calculateDistance(userCoords, [destCoords.lat, destCoords.lng]);
+                            
+                            // Adjust map view to show both locations
+                            const bounds = L.latLngBounds([userCoords, [destCoords.lat, destCoords.lng]]);
+                            map.fitBounds(bounds, { padding: [20, 20] });
+                        }
+                    },
+                    function(error) {
+                        console.error("Error getting location: ", error);
+                        document.getElementById('distance-info').innerHTML = '<i class="fas fa-road"></i><span>Gagal mendapatkan lokasi</span>';
+                    }
+                );
+            } else {
+                alert("Geolocation tidak didukung oleh browser ini.");
+            }
+        }
+        
+        // Calculate distance between two coordinates
+        function calculateDistance(coord1, coord2) {
+            // Using Haversine formula to calculate distance
+            const R = 6371; // Earth radius in km
+            const dLat = (coord2[0] - coord1[0]) * Math.PI / 180;
+            const dLon = (coord2[1] - coord1[1]) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(coord1[0] * Math.PI / 180) * Math.cos(coord2[0] * Math.PI / 180) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const distance = R * c;
+            
+            // Display distance
+            document.getElementById('distance-info').innerHTML = 
+                `<i class="fas fa-road"></i><span>${distance.toFixed(1)} km dari lokasi Anda</span>`;
+        }
+        
+        // Add route from user location to destination
+        function addRoute() {
+            if (!userMarker) {
+                alert("Silakan aktifkan izin lokasi terlebih dahulu");
+                getUserLocation();
+                return;
+            }
+            
+            const userCoords = userMarker.getLatLng();
+            const destinationCoords = destinationMarker.getLatLng();
+            
+            // Open directions in Google Maps
+            const url = `https://www.google.com/maps/dir/?api=1&origin=${userCoords.lat},${userCoords.lng}&destination=${destinationCoords.lat},${destinationCoords.lng}&travelmode=driving`;
+            window.open(url, '_blank');
+        }
+        
+        // Set up gallery modal
+        function setupGalleryModal() {
+            const galleryItems = document.querySelectorAll('.gallery-item');
+            const modal = document.getElementById('image-modal');
+            const modalImage = document.getElementById('modal-image');
+            const modalClose = document.querySelector('.modal-close');
+            
+            galleryItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const imgSrc = item.querySelector('img').getAttribute('src');
+                    modalImage.setAttribute('src', imgSrc);
+                    modal.style.display = 'flex';
+                });
+            });
+            
+            modalClose.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+        
+        // Load reviews from Supabase
+        async function loadReviews(destinationId, offset = 0) {
+            try {
+                const { data: reviews, error } = await supabase
+                    .from('reviews')
+                    .select(`
+                        *,
+                        users (
+                            name,
+                            avatar_url
+                        )
+                    `)
+                    .eq('destination_id', destinationId)
+                    .order('created_at', { ascending: false })
+                    .range(offset, offset + REVIEWS_PER_PAGE - 1);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                if (offset === 0) {
+                    currentReviews = reviews;
+                } else {
+                    currentReviews = [...currentReviews, ...reviews];
+                }
+                
+                displayReviews(currentReviews);
+                
+                // Hide load more button if we have less than REVIEWS_PER_PAGE reviews
+                if (reviews.length < REVIEWS_PER_PAGE) {
+                    document.getElementById('load-more-reviews').style.display = 'none';
+                } else {
+                    document.getElementById('load-more-reviews').style.display = 'block';
+                }
+                
+            } catch (error) {
+                console.error('Error loading reviews:', error);
+            }
+        }
+        
+        // Load more reviews
+        function loadMoreReviews() {
+            reviewsOffset += REVIEWS_PER_PAGE;
+            loadReviews(currentDestinationId, reviewsOffset);
+        }
+        
+        // Display reviews
+        function displayReviews(reviews) {
+            const container = document.getElementById('reviews-container');
+            
+            if (reviews.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 py-4">Belum ada ulasan untuk destinasi ini.</p>';
+                return;
+            }
+            
+            // Clear container if we're loading the first page
+            if (reviewsOffset === 0) {
+                container.innerHTML = '';
+            }
+            
+            reviews.forEach(review => {
+                const reviewCard = document.createElement('div');
+                reviewCard.className = 'review-card bg-white p-4 rounded-xl border-l-4 border-blue-500';
+                
+                const reviewDate = new Date(review.created_at).toLocaleDateString('id-ID', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                reviewCard.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="font-bold">${review.users.name}</h4>
+                            <div class="flex items-center mt-1">
+                                <div class="flex star-rating mr-2">
+                                    ${generateStars(review.rating)}
+                                </div>
+                                <span class="text-sm text-gray-500">${reviewDate}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-700">${review.comment}</p>
+                `;
+                
+                container.appendChild(reviewCard);
+            });
+        }
+        
+        // Submit review
+        async function submitReview(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const rating = parseInt(formData.get('rating'));
+            const comment = formData.get('comment');
+            
+            if (!rating) {
+                alert('Silakan beri rating terlebih dahulu');
+                return;
+            }
+            
+            if (!comment.trim()) {
+                alert('Silakan tulis komentar terlebih dahulu');
+                return;
+            }
+            
+            try {
+                // In a real app, you would have user authentication
+                // For demo purposes, we'll use a placeholder user ID
+                const userId = 1; // This should come from your auth system
+                
+                const { data, error } = await supabase
+                    .from('reviews')
+                    .insert([
+                        {
+                            destination_id: currentDestinationId,
+                            user_id: userId,
+                            rating: rating,
+                            comment: comment
+                        }
+                    ]);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                // Hide form and reset
+                document.getElementById('review-form-container').style.display = 'none';
+                document.getElementById('review-form').reset();
+                
+                // Reload reviews and destination data to update rating
+                loadReviews(currentDestinationId);
+                loadDestinationData(currentDestinationId);
+                
+                alert('Ulasan berhasil dikirim!');
+                
+            } catch (error) {
+                console.error('Error submitting review:', error);
+                alert('Terjadi kesalahan saat mengirim ulasan');
+            }
+        }
+        
+        // Load nearby destinations
+        async function loadNearbyDestinations() {
+            try {
+                const { data: destinations, error } = await supabase
+                    .from('destinations')
+                    .select('*')
+                    .neq('id', currentDestinationId)
+                    .limit(4);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                displayNearbyDestinations(destinations || []);
+                
+            } catch (error) {
+                console.error('Error loading nearby destinations:', error);
+            }
+        }
+        
+        // Display nearby destinations
+        function displayNearbyDestinations(destinations) {
+            const container = document.getElementById('nearby-container');
+            container.innerHTML = '';
+            
+            if (destinations.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 col-span-2">Tidak ada destinasi terdekat lainnya.</p>';
+                return;
+            }
+            
+            destinations.forEach(destination => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl overflow-hidden shadow-sm card-hover';
+                
+                card.innerHTML = `
+                    <div class="h-40 bg-cover bg-center" style="background-image: url('${destination.image_url}')"></div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-2">${destination.name}</h3>
+                        <p class="text-gray-600 text-sm mb-3">${destination.description.substring(0, 100)}...</p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <div class="flex star-rating text-sm mr-2">
+                                    ${generateStars(destination.rating)}
+                                </div>
+                                <span class="text-sm font-semibold">${parseFloat(destination.rating).toFixed(1)}</span>
+                            </div>
+                            <a href="detail_wisata.html?id=${destination.id}" class="text-sm text-blue-500 font-semibold hover:text-blue-700">
+                                Lihat Detail
+                            </a>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        // Track page view
+        async function trackPageView(destinationId) {
+            try {
+                const { data, error } = await supabase
+                    .from('page_views')
+                    .insert([
+                        {
+                            destination_id: destinationId,
+                            user_agent: navigator.userAgent,
+                            ip_address: '' // In a real app, you would get this from your backend
+                        }
+                    ]);
+                
+                if (error) {
+                    console.error('Error tracking page view:', error);
+                }
+            } catch (error) {
+                console.error('Error tracking page view:', error);
+            }
+        }
+        
+        // Load visit stats
+        async function loadVisitStats(destinationId) {
+            try {
+                // Get total visits
+                const { count: totalVisits, error: totalError } = await supabase
+                    .from('page_views')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('destination_id', destinationId);
+                
+                if (!totalError) {
+                    document.getElementById('total-visits').textContent = totalVisits || 0;
+                }
+                
+                // Get monthly visits (current month)
+                const now = new Date();
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                
+                const { count: monthlyVisits, error: monthlyError } = await supabase
+                    .from('page_views')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('destination_id', destinationId)
+                    .gte('created_at', startOfMonth.toISOString())
+                    .lte('created_at', endOfMonth.toISOString());
+                
+                if (!monthlyError) {
+                    document.getElementById('monthly-visits').textContent = monthlyVisits || 0;
+                }
+                
+            } catch (error) {
+                console.error('Error loading visit stats:', error);
+            }
+        }
+        
+        // Check if destination is in user's favorites
+        async function checkIfFavorite(destinationId) {
+            try {
+                // In a real app, you would check against the user's favorites
+                // For demo purposes, we'll check localStorage
+                const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+                const isFavorite = favorites.includes(destinationId);
+                
+                const saveBtn = document.getElementById('save-btn');
+                if (isFavorite) {
+                    saveBtn.innerHTML = '<i class="fas fa-bookmark"></i><span>Disimpan</span>';
+                } else {
+                    saveBtn.innerHTML = '<i class="far fa-bookmark"></i><span>Simpan</span>';
+                }
+                
+            } catch (error) {
+                console.error('Error checking favorite status:', error);
+            }
+        }
+        
+        // Toggle favorite status
+        async function toggleFavorite() {
+            try {
+                // In a real app, you would update the database
+                // For demo purposes, we'll use localStorage
+                const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+                const isFavorite = favorites.includes(currentDestinationId);
+                
+                const saveBtn = document.getElementById('save-btn');
+                
+                if (isFavorite) {
+                    // Remove from favorites
+                    const index = favorites.indexOf(currentDestinationId);
+                    favorites.splice(index, 1);
+                    saveBtn.innerHTML = '<i class="far fa-bookmark"></i><span>Simpan</span>';
+                } else {
+                    // Add to favorites
+                    favorites.push(currentDestinationId);
+                    saveBtn.innerHTML = '<i class="fas fa-bookmark"></i><span>Disimpan</span>';
+                }
+                
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+                
+            } catch (error) {
+                console.error('Error toggling favorite:', error);
+            }
+        }
+        
+        // Share destination
+        function shareDestination() {
+            if (navigator.share) {
+                navigator.share({
+                    title: document.getElementById('destination-name').textContent,
+                    text: document.getElementById('destination-description').textContent,
+                    url: window.location.href
+                })
+                .then(() => console.log('Berhasil dibagikan'))
+                .catch(error => console.log('Error sharing:', error));
+            } else {
+                // Fallback for browsers that don't support Web Share API
+                navigator.clipboard.writeText(window.location.href)
+                    .then(() => alert('Link berhasil disalin ke clipboard!'))
+                    .catch(err => console.error('Gagal menyalin link: ', err));
+            }
+        }
+    </script>
+</body>
+</html>

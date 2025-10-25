@@ -96,13 +96,6 @@
             animation-delay: 0.5s;
         }
         
-        .logo-container {
-            width: 900%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
         .destination-card {
             background-size: cover;
             background-position: center;
@@ -110,6 +103,7 @@
             border-radius: 16px;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
         
         .destination-overlay {
@@ -127,6 +121,7 @@
             overflow: hidden;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             background: white;
+            cursor: pointer;
         }
         
         .food-image {
@@ -287,6 +282,34 @@
             to { transform: rotate(360deg); }
         }
 
+        .logo-container {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 12px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+        }
+
+        .user-avatars {
+            display: flex;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid white;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-50">
@@ -302,9 +325,9 @@
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <!-- Logo & Brand -->
             <div class="flex items-center space-x-3">
-                <div class="w-12 h-12 rounded-lg flex items-center justify-center">
+                <div class="logo-glow">
                     <div class="logo-container">
-                        <img src="foto/logo.png" alt="Logo DK" class="logo-image">
+                        <span class="text-white font-bold">DK</span>
                     </div>
                 </div>
                 <div class="text-2xl font-black">
@@ -404,11 +427,13 @@
                     
                     <div class="flex items-center space-x-6 slide-in delay-500">
                         <div class="flex items-center space-x-2">
-                            <div class="flex -space-x-2">
+                            <div class="user-avatars -space-x-2">
+
                             </div>
+
                         </div>
                         <div class="flex items-center space-x-2">
-                            <div class="flex">
+                            <div class="flex text-yellow-400">
                             </div>
                         </div>
                     </div>
@@ -468,10 +493,14 @@
             
             <div id="destinations-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Destinations will be loaded here -->
+                <div class="text-center py-8">
+                    <div class="loading mx-auto mb-2"></div>
+                    <p class="text-gray-500">Memuat destinasi...</p>
+                </div>
             </div>
             
             <div class="text-center mt-10">
-                <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-full transition-colors shadow-md">
+                <button id="load-more-destinations" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-full transition-colors shadow-md">
                     LIHAT SEMUA DESTINASI
                 </button>
             </div>
@@ -492,10 +521,14 @@
             
             <div id="foods-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- Foods will be loaded here -->
+                <div class="text-center py-8 col-span-full">
+                    <div class="loading mx-auto mb-2"></div>
+                    <p class="text-gray-500">Memuat kuliner...</p>
+                </div>
             </div>
             
             <div class="text-center mt-10">
-                <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-full transition-colors shadow-md">
+                <button id="load-more-foods" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-full transition-colors shadow-md">
                     LIHAT SEMUA KULINER
                 </button>
             </div>
@@ -516,12 +549,137 @@
             
             <div id="events-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Events will be loaded here -->
+                <div class="text-center py-8 col-span-full">
+                    <div class="loading mx-auto mb-2"></div>
+                    <p class="text-gray-500">Memuat acara...</p>
+                </div>
             </div>
             
             <div class="text-center mt-10">
-                <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-full transition-colors shadow-md">
+                <button id="load-more-events" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-full transition-colors shadow-md">
                     LIHAT SEMUA ACARA
                 </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fitur Section -->
+    <section id="fitur" class="py-16 px-6 bg-gray-50">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">
+                    Fitur Unggulan DARJO KU
+                </h2>
+                <span class="inline-block bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold px-3 py-1 rounded-full">
+                    ✨ FITUR LENGKAP
+                </span>
+            </div>
+            
+            <!-- Bento Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <!-- DARJOWISATA - Large Card -->
+                <div class="md:col-span-2 md:row-span-2 bg-gradient-to-br from-blue-500 to-indigo-700 rounded-3xl p-6 text-white card-hover shine-effect">
+                    <div class="relative h-full flex flex-col">
+                        <div class="absolute top-0 right-0 w-24 h-24 -mt-4 -mr-4 bg-white/10 rounded-full"></div>
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mr-3">
+                                <i class="fas fa-map-marked-alt text-xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-black">DARJOWISATA</h3>
+                        </div>
+                        <p class="text-blue-100 mb-6 flex-grow">
+                            Panduan lengkap destinasi wisata di Sidoarjo. Mulai dari tempat bersejarah, wisata alam, hingga tempat foto instagramable.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <span class="bg-white/20 px-3 py-1 rounded-full text-sm">Peta Interaktif</span>
+                            <span class="bg-white/20 px-3 py-1 rounded-full text-sm">Rute Perjalanan</span>
+                            <span class="bg-white/20 px-3 py-1 rounded-full text-sm">Review Wisatawan</span>
+                            <span class="bg-white/20 px-3 py-1 rounded-full text-sm">Tiket & Harga</span>
+                        </div>
+                        <a href="#destinasi" class="bg-white text-blue-600 font-bold py-3 px-6 rounded-full self-start hover:bg-blue-50 transition-colors">
+                            Jelajahi Sekarang
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- KULINERKU -->
+                <div class="bg-gradient-to-br from-pink-500 to-rose-600 rounded-3xl p-6 text-white card-hover shine-effect">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-3">
+                            <i class="fas fa-utensils text-lg"></i>
+                        </div>
+                        <h3 class="text-xl font-black">KULINERKU</h3>
+                    </div>
+                    <p class="text-pink-100 mb-4">
+                        Temukan kuliner khas Sidoarjo dengan rating terbaik dan lokasi terdekat.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-white/20 px-2 py-1 rounded-full text-xs">Makanan Khas</span>
+                        <span class="bg-white/20 px-2 py-1 rounded-full text-xs">Tempat Makan</span>
+                        <span class="bg-white/20 px-2 py-1 rounded-full text-xs">Resep Tradisional</span>
+                    </div>
+                </div>
+                
+                <!-- ACARAKU -->
+                <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl p-6 text-white card-hover shine-effect">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-3">
+                            <i class="fas fa-calendar-alt text-lg"></i>
+                        </div>
+                        <h3 class="text-xl font-black">ACARAKU</h3>
+                    </div>
+                    <p class="text-amber-100">
+                        Informasi event dan festival lokal di Sidoarjo. Jangan lewatkan acara seru!
+                    </p>
+                </div>
+                
+                <!-- PENGINAPAN -->
+                <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl p-6 text-white card-hover shine-effect">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mr-3">
+                            <i class="fas fa-hotel text-lg"></i>
+                        </div>
+                        <h3 class="text-xl font-black">PENGINAPAN</h3>
+                    </div>
+                    <p class="text-indigo-100">
+                        Temukan hotel, homestay, dan penginapan terbaik di Sidoarjo dengan harga terbaik.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Additional Features -->
+            <div class="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto">
+                <div class="text-center">
+                    <div class="feature-icon bg-blue-100 text-blue-600 mx-auto">
+                        <i class="fas fa-route text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Rute Perjalanan</h3>
+                    <p class="text-gray-600 text-sm">Panduan rute terbaik menuju destinasi wisata</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="feature-icon bg-green-100 text-green-600 mx-auto">
+                        <i class="fas fa-language text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Multi Bahasa</h3>
+                    <p class="text-gray-600 text-sm">Tersedia dalam bahasa Indonesia dan Inggris</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="feature-icon bg-purple-100 text-purple-600 mx-auto">
+                        <i class="fas fa-mobile-alt text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Aplikasi Mobile</h3>
+                    <p class="text-gray-600 text-sm">Akses mudah melalui aplikasi smartphone</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="feature-icon bg-amber-100 text-amber-600 mx-auto">
+                        <i class="fas fa-comments text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Forum Komunitas</h3>
+                    <p class="text-gray-600 text-sm">Diskusi dan berbagi pengalaman dengan wisatawan lain</p>
+                </div>
             </div>
         </div>
     </section>
@@ -600,10 +758,10 @@
                 <!-- Logo & About -->
                 <div class="md:col-span-2">
                     <div class="flex items-center space-x-3 mb-4">
-                        <div class="logo-glow w-12 h-12 rounded-lg flex items-center justify-center">
+                        <div class="logo-glow">
                             <div class="logo-container">
-                        <img src="foto/logo.png" alt="Logo DK" class="logo-image">
-                    </div>
+                                <span class="text-white font-bold">DK</span>
+                            </div>
                         </div>
                         <div class="text-2xl font-black">
                             <span>DARJO</span>
@@ -679,8 +837,8 @@
 
     <script>
         // Supabase Configuration
-        const SUPABASE_URL = 'https://swnmxpknfxcolfohexup.supabase.co'; // Ganti dengan URL Supabase Anda
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bm14cGtuZnhjb2xmb2hleHVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyOTc1NDEsImV4cCI6MjA3Njg3MzU0MX0.V0pZMXn-EXUZlKcilT-ZZXbIWLFCEfHDDik7qWUDeWk'; // Ganti dengan anon key Anda
+        const SUPABASE_URL = 'https://swnmxpknfxcolfohexup.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bm14cGtuZnhjb2xmb2hleHVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyOTc1NDEsImV4cCI6MjA3Njg3MzU0MX0.V0pZMXn-EXUZlKcilT-ZZXbIWLFCEfHDDik7qWUDeWk';
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
@@ -704,6 +862,15 @@
                     rating: 4.0,
                     review_count: 280,
                     image_url: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                },
+                {
+                    id: 3,
+                    name: "Kampung Gading",
+                    category: "wisata-keluarga",
+                    description: "Desa wisata dengan berbagai spot foto menarik",
+                    rating: 5.0,
+                    review_count: 450,
+                    image_url: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
                 }
             ],
             foods: [
@@ -722,6 +889,22 @@
                     price: 45000,
                     rating: 4.0,
                     image_url: "https://images.unsplash.com/photo-1599084993091-1cb5c0721cc6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                },
+                {
+                    id: 3,
+                    name: "Otak-Otak Bandeng",
+                    description: "Olahan bandeng tanpa duri dengan bumbu khas",
+                    price: 35000,
+                    rating: 5.0,
+                    image_url: "https://images.unsplash.com/photo-1594212699904-3c2238c4d321?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                },
+                {
+                    id: 4,
+                    name: "Kue Lapis Legit",
+                    description: "Kue tradisional dengan tekstur berlapis dan rasa manis",
+                    price: 60000,
+                    rating: 4.5,
+                    image_url: "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
                 }
             ],
             events: [
@@ -732,6 +915,14 @@
                     date: "2025-08-15",
                     location: "Alun-alun Sidoarjo",
                     image_url: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                },
+                {
+                    id: 2,
+                    name: "Pameran UMKM Sidoarjo",
+                    description: "Pameran produk unggulan UMKM dari seluruh Sidoarjo",
+                    date: "2025-09-05",
+                    location: "Gedung Serba Guna Sidoarjo",
+                    image_url: "https://images.unsplash.com/photo-1551135042-1033a2c79cd3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
                 }
             ]
         };
@@ -752,7 +943,7 @@
                     .order('created_at', { ascending: false })
                     .limit(6);
                 
-                if (!destError && destinations) {
+                if (!destError && destinations && destinations.length > 0) {
                     displayDestinations(destinations);
                     document.getElementById('total-destinations').textContent = destinations.length + '+';
                 } else {
@@ -767,7 +958,7 @@
                     .order('created_at', { ascending: false })
                     .limit(8);
                 
-                if (!foodError && foods) {
+                if (!foodError && foods && foods.length > 0) {
                     displayFoods(foods);
                     document.getElementById('total-foods').textContent = foods.length + '+';
                 } else {
@@ -782,7 +973,7 @@
                     .order('event_date', { ascending: true })
                     .limit(3);
                 
-                if (!eventError && events) {
+                if (!eventError && events && events.length > 0) {
                     displayEvents(events);
                     document.getElementById('total-events').textContent = events.length + '+';
                 } else {
@@ -822,6 +1013,11 @@
                         </div>
                     </div>
                 `;
+                
+                // Add click event to navigate to detail page
+                card.addEventListener('click', () => {
+                    window.location.href = `detail_wisata.html?id=${destination.id}`;
+                });
                 
                 container.appendChild(card);
             });
@@ -1007,7 +1203,11 @@
                 `;
                 
                 resultItem.addEventListener('click', () => {
-                    showItemDetails(item);
+                    if (item.type === 'destinasi') {
+                        window.location.href = `detail_wisata.html?id=${item.id}`;
+                    } else {
+                        showItemDetails(item);
+                    }
                 });
                 
                 container.appendChild(resultItem);
@@ -1063,8 +1263,8 @@
             }
             
             detailsHTML += `
-                        <button class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition-colors">
-                            Lihat Detail
+                        <button class="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition-colors" onclick="closeModal()">
+                            Tutup
                         </button>
                     </div>
                 </div>
@@ -1072,6 +1272,12 @@
             
             modalResults.innerHTML = detailsHTML;
             modal.style.display = 'flex';
+        }
+
+        // Close modal function
+        function closeModal() {
+            const modal = document.getElementById('search-modal');
+            modal.style.display = 'none';
         }
 
         // Search event listeners
@@ -1120,13 +1326,11 @@
         const modal = document.getElementById('search-modal');
         const modalClose = document.querySelector('.modal-close');
         
-        modalClose.addEventListener('click', function() {
-            modal.style.display = 'none';
-        });
+        modalClose.addEventListener('click', closeModal);
         
         window.addEventListener('click', function(e) {
             if (e.target === modal) {
-                modal.style.display = 'none';
+                closeModal();
             }
         });
 
@@ -1152,6 +1356,19 @@
                     }
                 });
             });
+        });
+
+        // Load more functionality
+        document.getElementById('load-more-destinations').addEventListener('click', function() {
+            window.location.href = '#destinasi';
+        });
+
+        document.getElementById('load-more-foods').addEventListener('click', function() {
+            window.location.href = '#kuliner';
+        });
+
+        document.getElementById('load-more-events').addEventListener('click', function() {
+            window.location.href = '#acara';
         });
 
         // Slide-in animation on scroll
