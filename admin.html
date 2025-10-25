@@ -34,12 +34,156 @@
             height: 20px;
             border: 3px solid rgba(255,255,255,.3);
             border-radius: 50%;
-            border-top-color: #fff;
+            border-top-color: #3b82f6;
             animation: spin 1s ease-in-out infinite;
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        
+        .content-section {
+            display: block;
+        }
+        
+        .content-section.hidden {
+            display: none;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            position: relative;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .table th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .table tr:hover {
+            background: #f9fafb;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-inactive {
+            background: #fef2f2;
+            color: #991b1b;
         }
     </style>
 </head>
@@ -50,22 +194,22 @@
             <div class="text-xl font-bold">DARJO KU Admin</div>
         </div>
         <nav class="mt-8">
-            <a href="#dashboard" class="block py-3 px-6 bg-blue-700 border-l-4 border-white">
+            <a href="#dashboard" class="block py-3 px-6 bg-blue-700 border-l-4 border-white nav-link">
                 <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
             </a>
-            <a href="#destinations" class="block py-3 px-6 hover:bg-blue-700 border-l-4 border-transparent hover:border-white">
+            <a href="#destinations" class="block py-3 px-6 hover:bg-blue-700 border-l-4 border-transparent hover:border-white nav-link">
                 <i class="fas fa-map-marker-alt mr-3"></i>Destinasi
             </a>
-            <a href="#foods" class="block py-3 px-6 hover:bg-blue-700 border-l-4 border-transparent hover:border-white">
+            <a href="#foods" class="block py-3 px-6 hover:bg-blue-700 border-l-4 border-transparent hover:border-white nav-link">
                 <i class="fas fa-utensils mr-3"></i>Kuliner
             </a>
-            <a href="#events" class="block py-3 px-6 hover:bg-blue-700 border-l-4 border-transparent hover:border-white">
+            <a href="#events" class="block py-3 px-6 hover:bg-blue-700 border-l-4 border-transparent hover:border-white nav-link">
                 <i class="fas fa-calendar-alt mr-3"></i>Acara
             </a>
-            <a href="#users" class="block py-3 px-6 hover:bg-blue-700 border-l-4 border-transparent hover:border-white">
-                <i class="fas fa-users mr-3"></i>Pengguna
+            <a href="#reviews" class="block py-3 px-6 hover:bg-blue-700 border-l-4 border-transparent hover:border-white nav-link">
+                <i class="fas fa-star mr-3"></i>Ulasan
             </a>
-            <a href="index.html" class="block py-3 px-6 hover:bg-blue-700 border-l-4 border-transparent hover:border-white">
+            <a href="index.html" class="block py-3 px-6 hover:bg-blue-700 border-l-4 border-transparent hover:border-white mt-8">
                 <i class="fas fa-home mr-3"></i>Kembali ke Website
             </a>
         </nav>
@@ -105,47 +249,47 @@
                 <div class="mb-8">
                     <h2 class="text-2xl font-bold text-gray-800 mb-4">Dashboard</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="bg-white rounded-lg shadow p-6">
+                        <div class="stats-card">
                             <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-blue-100 text-blue-500 mr-4">
+                                <div class="p-3 rounded-full bg-white/20 text-white mr-4">
                                     <i class="fas fa-map-marker-alt text-xl"></i>
                                 </div>
                                 <div>
                                     <div class="text-2xl font-bold" id="stats-destinations">0</div>
-                                    <div class="text-gray-500">Destinasi Wisata</div>
+                                    <div class="text-blue-100">Destinasi Wisata</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white rounded-lg shadow p-6">
+                        <div class="stats-card">
                             <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-green-100 text-green-500 mr-4">
+                                <div class="p-3 rounded-full bg-white/20 text-white mr-4">
                                     <i class="fas fa-utensils text-xl"></i>
                                 </div>
                                 <div>
                                     <div class="text-2xl font-bold" id="stats-foods">0</div>
-                                    <div class="text-gray-500">Kuliner Khas</div>
+                                    <div class="text-blue-100">Kuliner Khas</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white rounded-lg shadow p-6">
+                        <div class="stats-card">
                             <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-purple-100 text-purple-500 mr-4">
+                                <div class="p-3 rounded-full bg-white/20 text-white mr-4">
                                     <i class="fas fa-calendar-alt text-xl"></i>
                                 </div>
                                 <div>
                                     <div class="text-2xl font-bold" id="stats-events">0</div>
-                                    <div class="text-gray-500">Acara & Event</div>
+                                    <div class="text-blue-100">Acara & Event</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white rounded-lg shadow p-6">
+                        <div class="stats-card">
                             <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-yellow-100 text-yellow-500 mr-4">
-                                    <i class="fas fa-users text-xl"></i>
+                                <div class="p-3 rounded-full bg-white/20 text-white mr-4">
+                                    <i class="fas fa-star text-xl"></i>
                                 </div>
                                 <div>
-                                    <div class="text-2xl font-bold" id="stats-users">0</div>
-                                    <div class="text-gray-500">Total Pengguna</div>
+                                    <div class="text-2xl font-bold" id="stats-reviews">0</div>
+                                    <div class="text-blue-100">Total Ulasan</div>
                                 </div>
                             </div>
                         </div>
@@ -159,17 +303,23 @@
                         </div>
                         <div class="p-4">
                             <div id="recent-destinations">
-                                <!-- Recent destinations will be loaded here -->
+                                <div class="text-center py-8 text-gray-500">
+                                    <div class="loading"></div>
+                                    <p class="mt-2">Memuat data...</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="bg-white rounded-lg shadow">
                         <div class="p-4 border-b">
-                            <h3 class="text-lg font-semibold">Kuliner Terbaru</h3>
+                            <h3 class="text-lg font-semibold">Ulasan Terbaru</h3>
                         </div>
                         <div class="p-4">
-                            <div id="recent-foods">
-                                <!-- Recent foods will be loaded here -->
+                            <div id="recent-reviews">
+                                <div class="text-center py-8 text-gray-500">
+                                    <div class="loading"></div>
+                                    <p class="mt-2">Memuat data...</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -180,7 +330,7 @@
             <section id="destinations" class="content-section hidden">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold text-gray-800">Kelola Destinasi Wisata</h2>
-                    <button id="add-destination-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+                    <button id="add-destination-btn" class="btn btn-primary">
                         <i class="fas fa-plus mr-2"></i>Tambah Destinasi
                     </button>
                 </div>
@@ -189,10 +339,10 @@
                     <div class="p-4 border-b">
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                             <div class="mb-4 md:mb-0">
-                                <input type="text" id="search-destinations" placeholder="Cari destinasi..." class="px-4 py-2 border rounded-lg w-full md:w-64">
+                                <input type="text" id="search-destinations" placeholder="Cari destinasi..." class="form-input w-full md:w-64">
                             </div>
                             <div class="flex space-x-2">
-                                <select id="category-filter" class="px-4 py-2 border rounded-lg">
+                                <select id="category-filter" class="form-input w-full md:w-auto">
                                     <option value="all">Semua Kategori</option>
                                     <option value="wisata-alam">Wisata Alam</option>
                                     <option value="wisata-sejarah">Wisata Sejarah</option>
@@ -202,18 +352,23 @@
                         </div>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ulasan</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                    <th>Nama</th>
+                                    <th>Kategori</th>
+                                    <th>Rating</th>
+                                    <th>Ulasan</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="destinations-table-body" class="bg-white divide-y divide-gray-200">
-                                <!-- Destinations will be loaded here -->
+                            <tbody id="destinations-table-body">
+                                <tr>
+                                    <td colspan="5" class="text-center py-8 text-gray-500">
+                                        <div class="loading"></div>
+                                        <p class="mt-2">Memuat data destinasi...</p>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -224,27 +379,32 @@
             <section id="foods" class="content-section hidden">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold text-gray-800">Kelola Kuliner</h2>
-                    <button id="add-food-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+                    <button id="add-food-btn" class="btn btn-primary">
                         <i class="fas fa-plus mr-2"></i>Tambah Kuliner
                     </button>
                 </div>
                 
                 <div class="bg-white rounded-lg shadow overflow-hidden">
                     <div class="p-4 border-b">
-                        <input type="text" id="search-foods" placeholder="Cari kuliner..." class="px-4 py-2 border rounded-lg w-full md:w-64">
+                        <input type="text" id="search-foods" placeholder="Cari kuliner..." class="form-input w-full md:w-64">
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                    <th>Nama</th>
+                                    <th>Harga</th>
+                                    <th>Rating</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="foods-table-body" class="bg-white divide-y divide-gray-200">
-                                <!-- Foods will be loaded here -->
+                            <tbody id="foods-table-body">
+                                <tr>
+                                    <td colspan="4" class="text-center py-8 text-gray-500">
+                                        <div class="loading"></div>
+                                        <p class="mt-2">Memuat data kuliner...</p>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -255,55 +415,66 @@
             <section id="events" class="content-section hidden">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold text-gray-800">Kelola Acara & Event</h2>
-                    <button id="add-event-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+                    <button id="add-event-btn" class="btn btn-primary">
                         <i class="fas fa-plus mr-2"></i>Tambah Acara
                     </button>
                 </div>
                 
                 <div class="bg-white rounded-lg shadow overflow-hidden">
                     <div class="p-4 border-b">
-                        <input type="text" id="search-events" placeholder="Cari acara..." class="px-4 py-2 border rounded-lg w-full md:w-64">
+                        <input type="text" id="search-events" placeholder="Cari acara..." class="form-input w-full md:w-64">
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                    <th>Nama</th>
+                                    <th>Tanggal</th>
+                                    <th>Lokasi</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="events-table-body" class="bg-white divide-y divide-gray-200">
-                                <!-- Events will be loaded here -->
+                            <tbody id="events-table-body">
+                                <tr>
+                                    <td colspan="4" class="text-center py-8 text-gray-500">
+                                        <div class="loading"></div>
+                                        <p class="mt-2">Memuat data acara...</p>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <!-- Users Section -->
-            <section id="users" class="content-section hidden">
+            <!-- Reviews Section -->
+            <section id="reviews" class="content-section hidden">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800">Kelola Pengguna</h2>
+                    <h2 class="text-2xl font-bold text-gray-800">Kelola Ulasan</h2>
                 </div>
                 
                 <div class="bg-white rounded-lg shadow overflow-hidden">
                     <div class="p-4 border-b">
-                        <input type="text" id="search-users" placeholder="Cari pengguna..." class="px-4 py-2 border rounded-lg w-full md:w-64">
+                        <input type="text" id="search-reviews" placeholder="Cari ulasan..." class="form-input w-full md:w-64">
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                    <th>Pengguna</th>
+                                    <th>Destinasi</th>
+                                    <th>Rating</th>
+                                    <th>Tanggal</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="users-table-body" class="bg-white divide-y divide-gray-200">
-                                <!-- Users will be loaded here -->
+                            <tbody id="reviews-table-body">
+                                <tr>
+                                    <td colspan="5" class="text-center py-8 text-gray-500">
+                                        <div class="loading"></div>
+                                        <p class="mt-2">Memuat data ulasan...</p>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -313,32 +484,30 @@
     </div>
 
     <!-- Modal for adding/editing items -->
-    <div id="modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <div class="flex justify-between items-center pb-3 border-b">
-                    <h3 class="text-xl font-semibold" id="modal-title">Tambah Data</h3>
-                    <button id="modal-close" class="text-gray-400 hover:text-gray-600">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="mt-4">
-                    <form id="modal-form">
-                        <!-- Form content will be dynamically generated -->
-                    </form>
-                </div>
-                <div class="flex justify-end space-x-3 mt-6 pt-3 border-t">
-                    <button id="modal-cancel" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Batal</button>
-                    <button id="modal-save" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Simpan</button>
-                </div>
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center pb-3 border-b mb-4">
+                <h3 class="text-xl font-semibold" id="modal-title">Tambah Data</h3>
+                <button id="modal-close" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div>
+                <form id="modal-form">
+                    <!-- Form content will be dynamically generated -->
+                </form>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6 pt-4 border-t">
+                <button id="modal-cancel" class="btn btn-secondary">Batal</button>
+                <button id="modal-save" class="btn btn-primary">Simpan</button>
             </div>
         </div>
     </div>
 
     <script>
         // Supabase Configuration
-        const SUPABASE_URL = 'https://swnmxpknfxcolfohexup.supabase.co'; // Ganti dengan URL Supabase Anda
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bm14cGtuZnhjb2xmb2hleHVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyOTc1NDEsImV4cCI6MjA3Njg3MzU0MX0.V0pZMXn-EXUZlKcilT-ZZXbIWLFCEfHDDik7qWUDeWk'; // Ganti dengan anon key Anda
+        const SUPABASE_URL = 'https://swnmxpknfxcolfohexup.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bm14cGtuZnhjb2xmb2hleHVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyOTc1NDEsImV4cCI6MjA3Njg3MzU0MX0.V0pZMXn-EXUZlKcilT-ZZXbIWLFCEfHDDik7qWUDeWk';
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
@@ -351,7 +520,7 @@
         const sidebar = document.querySelector('.sidebar');
         const sidebarToggle = document.getElementById('sidebar-toggle');
         const contentSections = document.querySelectorAll('.content-section');
-        const navLinks = document.querySelectorAll('nav a');
+        const navLinks = document.querySelectorAll('.nav-link');
         const pageTitle = document.getElementById('page-title');
         const modal = document.getElementById('modal');
         const modalTitle = document.getElementById('modal-title');
@@ -407,7 +576,7 @@
             document.getElementById('search-destinations').addEventListener('input', filterDestinations);
             document.getElementById('search-foods').addEventListener('input', filterFoods);
             document.getElementById('search-events').addEventListener('input', filterEvents);
-            document.getElementById('search-users').addEventListener('input', filterUsers);
+            document.getElementById('search-reviews').addEventListener('input', filterReviews);
             document.getElementById('category-filter').addEventListener('change', filterDestinations);
         }
 
@@ -429,8 +598,8 @@
                 loadFoods();
             } else if (section === 'events') {
                 loadEvents();
-            } else if (section === 'users') {
-                loadUsers();
+            } else if (section === 'reviews') {
+                loadReviews();
             }
             
             currentSection = section;
@@ -443,7 +612,7 @@
                 'destinations': 'Kelola Destinasi',
                 'foods': 'Kelola Kuliner',
                 'events': 'Kelola Acara',
-                'users': 'Kelola Pengguna'
+                'reviews': 'Kelola Ulasan'
             };
             return titles[section] || 'Dashboard';
         }
@@ -464,11 +633,15 @@
                     .from('events')
                     .select('*', { count: 'exact', head: true });
                 
+                const { data: reviews, count: reviewCount } = await supabase
+                    .from('reviews')
+                    .select('*', { count: 'exact', head: true });
+                
                 // Update stats
                 document.getElementById('stats-destinations').textContent = destCount || 0;
                 document.getElementById('stats-foods').textContent = foodCount || 0;
                 document.getElementById('stats-events').textContent = eventCount || 0;
-                document.getElementById('stats-users').textContent = '3500+'; // Placeholder
+                document.getElementById('stats-reviews').textContent = reviewCount || 0;
                 
                 // Load recent items
                 const { data: recentDestinations } = await supabase
@@ -477,15 +650,19 @@
                     .order('created_at', { ascending: false })
                     .limit(5);
                 
-                const { data: recentFoods } = await supabase
-                    .from('foods')
-                    .select('*')
+                const { data: recentReviews } = await supabase
+                    .from('reviews')
+                    .select(`
+                        *,
+                        destinations (name),
+                        users (name)
+                    `)
                     .order('created_at', { ascending: false })
                     .limit(5);
                 
                 // Display recent items
                 displayRecentDestinations(recentDestinations || []);
-                displayRecentFoods(recentFoods || []);
+                displayRecentReviews(recentReviews || []);
                 
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
@@ -504,9 +681,11 @@
                     displayDestinationsTable(destinations || []);
                 } else {
                     console.error('Error loading destinations:', error);
+                    displayDestinationsTable([]);
                 }
             } catch (error) {
                 console.error('Error loading destinations:', error);
+                displayDestinationsTable([]);
             }
         }
 
@@ -522,9 +701,11 @@
                     displayFoodsTable(foods || []);
                 } else {
                     console.error('Error loading foods:', error);
+                    displayFoodsTable([]);
                 }
             } catch (error) {
                 console.error('Error loading foods:', error);
+                displayFoodsTable([]);
             }
         }
 
@@ -540,26 +721,35 @@
                     displayEventsTable(events || []);
                 } else {
                     console.error('Error loading events:', error);
+                    displayEventsTable([]);
                 }
             } catch (error) {
                 console.error('Error loading events:', error);
+                displayEventsTable([]);
             }
         }
 
-        // Load users for management
-        async function loadUsers() {
+        // Load reviews for management
+        async function loadReviews() {
             try {
-                // This would typically come from your authentication system
-                // For now, we'll use placeholder data
-                const users = [
-                    { id: 1, name: 'Ahmad Wijaya', email: 'ahmad@example.com', status: 'Aktif' },
-                    { id: 2, name: 'Siti Nurhaliza', email: 'siti@example.com', status: 'Aktif' },
-                    { id: 3, name: 'Budi Santoso', email: 'budi@example.com', status: 'Nonaktif' }
-                ];
+                const { data: reviews, error } = await supabase
+                    .from('reviews')
+                    .select(`
+                        *,
+                        destinations (name),
+                        users (name)
+                    `)
+                    .order('created_at', { ascending: false });
                 
-                displayUsersTable(users);
+                if (!error) {
+                    displayReviewsTable(reviews || []);
+                } else {
+                    console.error('Error loading reviews:', error);
+                    displayReviewsTable([]);
+                }
             } catch (error) {
-                console.error('Error loading users:', error);
+                console.error('Error loading reviews:', error);
+                displayReviewsTable([]);
             }
         }
 
@@ -569,7 +759,7 @@
             container.innerHTML = '';
             
             if (destinations.length === 0) {
-                container.innerHTML = '<p class="text-gray-500">Tidak ada destinasi terbaru</p>';
+                container.innerHTML = '<p class="text-center text-gray-500 py-4">Tidak ada destinasi terbaru</p>';
                 return;
             }
             
@@ -581,7 +771,7 @@
                     <div class="w-12 h-12 bg-cover bg-center rounded-lg mr-4" style="background-image: url('${destination.image_url}')"></div>
                     <div class="flex-1">
                         <div class="font-medium">${destination.name}</div>
-                        <div class="text-sm text-gray-500">${destination.category}</div>
+                        <div class="text-sm text-gray-500">${getCategoryName(destination.category)}</div>
                     </div>
                     <div class="text-sm text-gray-500">${formatDate(destination.created_at)}</div>
                 `;
@@ -590,27 +780,29 @@
             });
         }
 
-        // Display recent foods
-        function displayRecentFoods(foods) {
-            const container = document.getElementById('recent-foods');
+        // Display recent reviews
+        function displayRecentReviews(reviews) {
+            const container = document.getElementById('recent-reviews');
             container.innerHTML = '';
             
-            if (foods.length === 0) {
-                container.innerHTML = '<p class="text-gray-500">Tidak ada kuliner terbaru</p>';
+            if (reviews.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 py-4">Tidak ada ulasan terbaru</p>';
                 return;
             }
             
-            foods.forEach(food => {
+            reviews.forEach(review => {
                 const item = document.createElement('div');
                 item.className = 'flex items-center py-3 border-b last:border-b-0';
                 
+                const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                
                 item.innerHTML = `
-                    <div class="w-12 h-12 bg-cover bg-center rounded-lg mr-4" style="background-image: url('${food.image_url}')"></div>
                     <div class="flex-1">
-                        <div class="font-medium">${food.name}</div>
-                        <div class="text-sm text-gray-500">Rp ${food.price.toLocaleString()}</div>
+                        <div class="font-medium">${review.users?.name || 'Pengguna'}</div>
+                        <div class="text-sm text-gray-500">${review.destinations?.name || 'Destinasi'}</div>
+                        <div class="text-yellow-500 text-sm">${stars}</div>
                     </div>
-                    <div class="text-sm text-gray-500">${formatDate(food.created_at)}</div>
+                    <div class="text-sm text-gray-500">${formatDate(review.created_at)}</div>
                 `;
                 
                 container.appendChild(item);
@@ -625,7 +817,7 @@
             if (destinations.length === 0) {
                 container.innerHTML = `
                     <tr>
-                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">Tidak ada destinasi</td>
+                        <td colspan="5" class="text-center py-8 text-gray-500">Tidak ada destinasi</td>
                     </tr>
                 `;
                 return;
@@ -635,28 +827,34 @@
                 const row = document.createElement('tr');
                 
                 row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 h-10 w-10">
-                                <div class="h-10 w-10 rounded-full bg-cover bg-center" style="background-image: url('${destination.image_url}')"></div>
-                            </div>
-                            <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-900">${destination.name}</div>
-                            </div>
+                    <td class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-cover bg-center mr-3" style="background-image: url('${destination.image_url}')"></div>
+                        <div>
+                            <div class="font-medium">${destination.name}</div>
+                            <div class="text-sm text-gray-500 truncate max-w-xs">${destination.description}</div>
                         </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td>
                         <div class="text-sm text-gray-900">${getCategoryName(destination.category)}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">${destination.rating}</div>
+                    <td>
+                        <div class="flex items-center">
+                            <div class="text-yellow-500 mr-1">★</div>
+                            <div class="text-sm font-medium">${destination.rating}</div>
+                        </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td class="text-sm text-gray-500">
                         ${destination.review_count}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button class="text-blue-600 hover:text-blue-900 mr-3 edit-btn" data-id="${destination.id}" data-type="destination">Edit</button>
-                        <button class="text-red-600 hover:text-red-900 delete-btn" data-id="${destination.id}" data-type="destination">Hapus</button>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="text-blue-600 hover:text-blue-900 edit-btn" data-id="${destination.id}" data-type="destination">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="text-red-600 hover:text-red-900 delete-btn" data-id="${destination.id}" data-type="destination">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 `;
                 
@@ -664,21 +862,7 @@
             });
             
             // Add event listeners to edit and delete buttons
-            document.querySelectorAll('.edit-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const id = this.getAttribute('data-id');
-                    const type = this.getAttribute('data-type');
-                    openEditModal(id, type);
-                });
-            });
-            
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const id = this.getAttribute('data-id');
-                    const type = this.getAttribute('data-type');
-                    deleteItem(id, type);
-                });
-            });
+            addActionButtonListeners();
         }
 
         // Display foods table
@@ -689,7 +873,7 @@
             if (foods.length === 0) {
                 container.innerHTML = `
                     <tr>
-                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">Tidak ada kuliner</td>
+                        <td colspan="4" class="text-center py-8 text-gray-500">Tidak ada kuliner</td>
                     </tr>
                 `;
                 return;
@@ -699,25 +883,31 @@
                 const row = document.createElement('tr');
                 
                 row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 h-10 w-10">
-                                <div class="h-10 w-10 rounded-full bg-cover bg-center" style="background-image: url('${food.image_url}')"></div>
-                            </div>
-                            <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-900">${food.name}</div>
-                            </div>
+                    <td class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-cover bg-center mr-3" style="background-image: url('${food.image_url}')"></div>
+                        <div>
+                            <div class="font-medium">${food.name}</div>
+                            <div class="text-sm text-gray-500 truncate max-w-xs">${food.description}</div>
                         </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td>
                         <div class="text-sm text-gray-900">Rp ${food.price.toLocaleString()}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">${food.rating}</div>
+                    <td>
+                        <div class="flex items-center">
+                            <div class="text-yellow-500 mr-1">★</div>
+                            <div class="text-sm font-medium">${food.rating}</div>
+                        </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button class="text-blue-600 hover:text-blue-900 mr-3 edit-btn" data-id="${food.id}" data-type="food">Edit</button>
-                        <button class="text-red-600 hover:text-red-900 delete-btn" data-id="${food.id}" data-type="food">Hapus</button>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="text-blue-600 hover:text-blue-900 edit-btn" data-id="${food.id}" data-type="food">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="text-red-600 hover:text-red-900 delete-btn" data-id="${food.id}" data-type="food">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 `;
                 
@@ -725,21 +915,7 @@
             });
             
             // Add event listeners to edit and delete buttons
-            document.querySelectorAll('.edit-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const id = this.getAttribute('data-id');
-                    const type = this.getAttribute('data-type');
-                    openEditModal(id, type);
-                });
-            });
-            
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const id = this.getAttribute('data-id');
-                    const type = this.getAttribute('data-type');
-                    deleteItem(id, type);
-                });
-            });
+            addActionButtonListeners();
         }
 
         // Display events table
@@ -750,7 +926,7 @@
             if (events.length === 0) {
                 container.innerHTML = `
                     <tr>
-                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">Tidak ada acara</td>
+                        <td colspan="4" class="text-center py-8 text-gray-500">Tidak ada acara</td>
                     </tr>
                 `;
                 return;
@@ -766,25 +942,28 @@
                 });
                 
                 row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 h-10 w-10">
-                                <div class="h-10 w-10 rounded-full bg-cover bg-center" style="background-image: url('${event.image_url}')"></div>
-                            </div>
-                            <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-900">${event.name}</div>
-                            </div>
+                    <td class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-cover bg-center mr-3" style="background-image: url('${event.image_url}')"></div>
+                        <div>
+                            <div class="font-medium">${event.name}</div>
+                            <div class="text-sm text-gray-500 truncate max-w-xs">${event.description}</div>
                         </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td>
                         <div class="text-sm text-gray-900">${formattedDate}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td>
                         <div class="text-sm text-gray-900">${event.location}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button class="text-blue-600 hover:text-blue-900 mr-3 edit-btn" data-id="${event.id}" data-type="event">Edit</button>
-                        <button class="text-red-600 hover:text-red-900 delete-btn" data-id="${event.id}" data-type="event">Hapus</button>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="text-blue-600 hover:text-blue-900 edit-btn" data-id="${event.id}" data-type="event">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="text-red-600 hover:text-red-900 delete-btn" data-id="${event.id}" data-type="event">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 `;
                 
@@ -792,6 +971,68 @@
             });
             
             // Add event listeners to edit and delete buttons
+            addActionButtonListeners();
+        }
+
+        // Display reviews table
+        function displayReviewsTable(reviews) {
+            const container = document.getElementById('reviews-table-body');
+            container.innerHTML = '';
+            
+            if (reviews.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-8 text-gray-500">Tidak ada ulasan</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            reviews.forEach(review => {
+                const row = document.createElement('tr');
+                const reviewDate = new Date(review.created_at);
+                const formattedDate = reviewDate.toLocaleDateString('id-ID', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                
+                const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                
+                row.innerHTML = `
+                    <td>
+                        <div class="font-medium">${review.users?.name || 'Pengguna'}</div>
+                    </td>
+                    <td>
+                        <div class="text-sm text-gray-900">${review.destinations?.name || 'Destinasi'}</div>
+                    </td>
+                    <td>
+                        <div class="flex items-center">
+                            <div class="text-yellow-500">${stars}</div>
+                            <div class="text-sm font-medium ml-2">${review.rating}/5</div>
+                        </div>
+                    </td>
+                    <td class="text-sm text-gray-500">
+                        ${formattedDate}
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="text-red-600 hover:text-red-900 delete-btn" data-id="${review.id}" data-type="review">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                
+                container.appendChild(row);
+            });
+            
+            // Add event listeners to delete buttons
+            addActionButtonListeners();
+        }
+
+        // Add event listeners to action buttons
+        function addActionButtonListeners() {
             document.querySelectorAll('.edit-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const id = this.getAttribute('data-id');
@@ -806,45 +1047,6 @@
                     const type = this.getAttribute('data-type');
                     deleteItem(id, type);
                 });
-            });
-        }
-
-        // Display users table
-        function displayUsersTable(users) {
-            const container = document.getElementById('users-table-body');
-            container.innerHTML = '';
-            
-            if (users.length === 0) {
-                container.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">Tidak ada pengguna</td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            users.forEach(user => {
-                const row = document.createElement('tr');
-                
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-gray-900">${user.name}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">${user.email}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.status === 'Aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                            ${user.status}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button class="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
-                        <button class="text-red-600 hover:text-red-900">Hapus</button>
-                    </td>
-                `;
-                
-                container.appendChild(row);
             });
         }
 
@@ -879,92 +1081,106 @@
             if (type === 'destination') {
                 title = 'Tambah Destinasi Wisata';
                 formHTML = `
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Nama Destinasi</label>
-                        <input type="text" id="name" name="name" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <div class="form-group">
+                        <label class="form-label" for="name">Nama Destinasi</label>
+                        <input type="text" id="name" name="name" class="form-input" required>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Deskripsi</label>
-                        <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                    <div class="form-group">
+                        <label class="form-label" for="description">Deskripsi</label>
+                        <textarea id="description" name="description" rows="3" class="form-input" required></textarea>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="category">Kategori</label>
-                        <select id="category" name="category" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <div class="form-group">
+                        <label class="form-label" for="category">Kategori</label>
+                        <select id="category" name="category" class="form-input" required>
                             <option value="wisata-alam">Wisata Alam</option>
                             <option value="wisata-sejarah">Wisata Sejarah</option>
                             <option value="wisata-keluarga">Wisata Keluarga</option>
                         </select>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="image_url">URL Gambar</label>
-                        <input type="url" id="image_url" name="image_url" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <div class="form-group">
+                        <label class="form-label" for="image_url">URL Gambar</label>
+                        <input type="url" id="image_url" name="image_url" class="form-input" required>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="rating">Rating</label>
-                            <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <div class="form-group">
+                            <label class="form-label" for="rating">Rating</label>
+                            <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" class="form-input" value="0" required>
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="review_count">Jumlah Ulasan</label>
-                            <input type="number" id="review_count" name="review_count" min="0" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <div class="form-group">
+                            <label class="form-label" for="review_count">Jumlah Ulasan</label>
+                            <input type="number" id="review_count" name="review_count" min="0" class="form-input" value="0" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="address">Alamat</label>
+                        <input type="text" id="address" name="address" class="form-input">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label class="form-label" for="latitude">Latitude</label>
+                            <input type="number" id="latitude" name="latitude" step="any" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="longitude">Longitude</label>
+                            <input type="number" id="longitude" name="longitude" step="any" class="form-input">
                         </div>
                     </div>
                 `;
             } else if (type === 'food') {
                 title = 'Tambah Kuliner';
                 formHTML = `
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Nama Kuliner</label>
-                        <input type="text" id="name" name="name" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <div class="form-group">
+                        <label class="form-label" for="name">Nama Kuliner</label>
+                        <input type="text" id="name" name="name" class="form-input" required>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Deskripsi</label>
-                        <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                    <div class="form-group">
+                        <label class="form-label" for="description">Deskripsi</label>
+                        <textarea id="description" name="description" rows="3" class="form-input" required></textarea>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="image_url">URL Gambar</label>
-                        <input type="url" id="image_url" name="image_url" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <div class="form-group">
+                        <label class="form-label" for="image_url">URL Gambar</label>
+                        <input type="url" id="image_url" name="image_url" class="form-input" required>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="price">Harga (Rp)</label>
-                            <input type="number" id="price" name="price" min="0" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <div class="form-group">
+                            <label class="form-label" for="price">Harga (Rp)</label>
+                            <input type="number" id="price" name="price" min="0" class="form-input" required>
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="rating">Rating</label>
-                            <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <div class="form-group">
+                            <label class="form-label" for="rating">Rating</label>
+                            <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" class="form-input" value="0" required>
                         </div>
                     </div>
                 `;
             } else if (type === 'event') {
                 title = 'Tambah Acara';
                 formHTML = `
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Nama Acara</label>
-                        <input type="text" id="name" name="name" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <div class="form-group">
+                        <label class="form-label" for="name">Nama Acara</label>
+                        <input type="text" id="name" name="name" class="form-input" required>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Deskripsi</label>
-                        <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                    <div class="form-group">
+                        <label class="form-label" for="description">Deskripsi</label>
+                        <textarea id="description" name="description" rows="3" class="form-input" required></textarea>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="image_url">URL Gambar</label>
-                        <input type="url" id="image_url" name="image_url" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <div class="form-group">
+                        <label class="form-label" for="image_url">URL Gambar</label>
+                        <input type="url" id="image_url" name="image_url" class="form-input" required>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="event_date">Tanggal Acara</label>
-                        <input type="date" id="event_date" name="event_date" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <div class="form-group">
+                        <label class="form-label" for="event_date">Tanggal Acara</label>
+                        <input type="date" id="event_date" name="event_date" class="form-input" required>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="location">Lokasi</label>
-                        <input type="text" id="location" name="location" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <div class="form-group">
+                        <label class="form-label" for="location">Lokasi</label>
+                        <input type="text" id="location" name="location" class="form-input" required>
                     </div>
                 `;
             }
             
             modalTitle.textContent = title;
             modalForm.innerHTML = formHTML;
-            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
         }
 
         // Open edit modal
@@ -1012,60 +1228,74 @@
                 if (type === 'destination') {
                     title = 'Edit Destinasi Wisata';
                     formHTML = `
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Nama Destinasi</label>
-                            <input type="text" id="name" name="name" value="${item.name}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <div class="form-group">
+                            <label class="form-label" for="name">Nama Destinasi</label>
+                            <input type="text" id="name" name="name" value="${item.name}" class="form-input" required>
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Deskripsi</label>
-                            <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>${item.description}</textarea>
+                        <div class="form-group">
+                            <label class="form-label" for="description">Deskripsi</label>
+                            <textarea id="description" name="description" rows="3" class="form-input" required>${item.description}</textarea>
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="category">Kategori</label>
-                            <select id="category" name="category" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <div class="form-group">
+                            <label class="form-label" for="category">Kategori</label>
+                            <select id="category" name="category" class="form-input" required>
                                 <option value="wisata-alam" ${item.category === 'wisata-alam' ? 'selected' : ''}>Wisata Alam</option>
                                 <option value="wisata-sejarah" ${item.category === 'wisata-sejarah' ? 'selected' : ''}>Wisata Sejarah</option>
                                 <option value="wisata-keluarga" ${item.category === 'wisata-keluarga' ? 'selected' : ''}>Wisata Keluarga</option>
                             </select>
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="image_url">URL Gambar</label>
-                            <input type="url" id="image_url" name="image_url" value="${item.image_url}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <div class="form-group">
+                            <label class="form-label" for="image_url">URL Gambar</label>
+                            <input type="url" id="image_url" name="image_url" value="${item.image_url}" class="form-input" required>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
-                            <div class="mb-4">
-                                <label class="block text-gray-700 text-sm font-bold mb-2" for="rating">Rating</label>
-                                <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" value="${item.rating}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <div class="form-group">
+                                <label class="form-label" for="rating">Rating</label>
+                                <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" value="${item.rating}" class="form-input" required>
                             </div>
-                            <div class="mb-4">
-                                <label class="block text-gray-700 text-sm font-bold mb-2" for="review_count">Jumlah Ulasan</label>
-                                <input type="number" id="review_count" name="review_count" min="0" value="${item.review_count}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <div class="form-group">
+                                <label class="form-label" for="review_count">Jumlah Ulasan</label>
+                                <input type="number" id="review_count" name="review_count" min="0" value="${item.review_count}" class="form-input" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="address">Alamat</label>
+                            <input type="text" id="address" name="address" value="${item.address || ''}" class="form-input">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label" for="latitude">Latitude</label>
+                                <input type="number" id="latitude" name="latitude" step="any" value="${item.latitude || ''}" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="longitude">Longitude</label>
+                                <input type="number" id="longitude" name="longitude" step="any" value="${item.longitude || ''}" class="form-input">
                             </div>
                         </div>
                     `;
                 } else if (type === 'food') {
                     title = 'Edit Kuliner';
                     formHTML = `
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Nama Kuliner</label>
-                            <input type="text" id="name" name="name" value="${item.name}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <div class="form-group">
+                            <label class="form-label" for="name">Nama Kuliner</label>
+                            <input type="text" id="name" name="name" value="${item.name}" class="form-input" required>
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Deskripsi</label>
-                            <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>${item.description}</textarea>
+                        <div class="form-group">
+                            <label class="form-label" for="description">Deskripsi</label>
+                            <textarea id="description" name="description" rows="3" class="form-input" required>${item.description}</textarea>
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="image_url">URL Gambar</label>
-                            <input type="url" id="image_url" name="image_url" value="${item.image_url}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <div class="form-group">
+                            <label class="form-label" for="image_url">URL Gambar</label>
+                            <input type="url" id="image_url" name="image_url" value="${item.image_url}" class="form-input" required>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
-                            <div class="mb-4">
-                                <label class="block text-gray-700 text-sm font-bold mb-2" for="price">Harga (Rp)</label>
-                                <input type="number" id="price" name="price" min="0" value="${item.price}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <div class="form-group">
+                                <label class="form-label" for="price">Harga (Rp)</label>
+                                <input type="number" id="price" name="price" min="0" value="${item.price}" class="form-input" required>
                             </div>
-                            <div class="mb-4">
-                                <label class="block text-gray-700 text-sm font-bold mb-2" for="rating">Rating</label>
-                                <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" value="${item.rating}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <div class="form-group">
+                                <label class="form-label" for="rating">Rating</label>
+                                <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" value="${item.rating}" class="form-input" required>
                             </div>
                         </div>
                     `;
@@ -1076,32 +1306,32 @@
                     
                     title = 'Edit Acara';
                     formHTML = `
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Nama Acara</label>
-                            <input type="text" id="name" name="name" value="${item.name}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <div class="form-group">
+                            <label class="form-label" for="name">Nama Acara</label>
+                            <input type="text" id="name" name="name" value="${item.name}" class="form-input" required>
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Deskripsi</label>
-                            <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>${item.description}</textarea>
+                        <div class="form-group">
+                            <label class="form-label" for="description">Deskripsi</label>
+                            <textarea id="description" name="description" rows="3" class="form-input" required>${item.description}</textarea>
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="image_url">URL Gambar</label>
-                            <input type="url" id="image_url" name="image_url" value="${item.image_url}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <div class="form-group">
+                            <label class="form-label" for="image_url">URL Gambar</label>
+                            <input type="url" id="image_url" name="image_url" value="${item.image_url}" class="form-input" required>
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="event_date">Tanggal Acara</label>
-                            <input type="date" id="event_date" name="event_date" value="${formattedDate}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <div class="form-group">
+                            <label class="form-label" for="event_date">Tanggal Acara</label>
+                            <input type="date" id="event_date" name="event_date" value="${formattedDate}" class="form-input" required>
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="location">Lokasi</label>
-                            <input type="text" id="location" name="location" value="${item.location}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <div class="form-group">
+                            <label class="form-label" for="location">Lokasi</label>
+                            <input type="text" id="location" name="location" value="${item.location}" class="form-input" required>
                         </div>
                     `;
                 }
                 
                 modalTitle.textContent = title;
                 modalForm.innerHTML = formHTML;
-                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
                 
             } catch (error) {
                 console.error('Error loading item for edit:', error);
@@ -1111,7 +1341,7 @@
 
         // Close modal
         function closeModal() {
-            modal.classList.add('hidden');
+            modal.style.display = 'none';
             currentEditingId = null;
             currentEditingType = null;
         }
@@ -1125,6 +1355,8 @@
             if (data.rating) data.rating = parseFloat(data.rating);
             if (data.review_count) data.review_count = parseInt(data.review_count);
             if (data.price) data.price = parseInt(data.price);
+            if (data.latitude) data.latitude = parseFloat(data.latitude);
+            if (data.longitude) data.longitude = parseFloat(data.longitude);
             
             try {
                 let result;
@@ -1180,6 +1412,8 @@
                     loadFoods();
                 } else if (currentSection === 'events') {
                     loadEvents();
+                } else if (currentSection === 'reviews') {
+                    loadReviews();
                 }
                 
             } catch (error) {
@@ -1212,6 +1446,11 @@
                         .from('events')
                         .delete()
                         .eq('id', id);
+                } else if (type === 'review') {
+                    result = await supabase
+                        .from('reviews')
+                        .delete()
+                        .eq('id', id);
                 }
                 
                 if (result.error) {
@@ -1229,6 +1468,8 @@
                     loadFoods();
                 } else if (currentSection === 'events') {
                     loadEvents();
+                } else if (currentSection === 'reviews') {
+                    loadReviews();
                 }
                 
             } catch (error) {
@@ -1244,8 +1485,10 @@
             const rows = document.querySelectorAll('#destinations-table-body tr');
             
             rows.forEach(row => {
-                const name = row.querySelector('td:first-child div div:first-child').textContent.toLowerCase();
-                const category = row.querySelector('td:nth-child(2) div').textContent.toLowerCase();
+                if (row.cells.length < 2) return;
+                
+                const name = row.cells[0].textContent.toLowerCase();
+                const category = row.cells[1].textContent.toLowerCase();
                 
                 const matchesSearch = name.includes(searchTerm);
                 const matchesCategory = categoryFilter === 'all' || category.includes(categoryFilter);
@@ -1259,7 +1502,9 @@
             const rows = document.querySelectorAll('#foods-table-body tr');
             
             rows.forEach(row => {
-                const name = row.querySelector('td:first-child div div:first-child').textContent.toLowerCase();
+                if (row.cells.length < 2) return;
+                
+                const name = row.cells[0].textContent.toLowerCase();
                 row.style.display = name.includes(searchTerm) ? '' : 'none';
             });
         }
@@ -1269,20 +1514,24 @@
             const rows = document.querySelectorAll('#events-table-body tr');
             
             rows.forEach(row => {
-                const name = row.querySelector('td:first-child div div:first-child').textContent.toLowerCase();
+                if (row.cells.length < 2) return;
+                
+                const name = row.cells[0].textContent.toLowerCase();
                 row.style.display = name.includes(searchTerm) ? '' : 'none';
             });
         }
 
-        function filterUsers() {
-            const searchTerm = document.getElementById('search-users').value.toLowerCase();
-            const rows = document.querySelectorAll('#users-table-body tr');
+        function filterReviews() {
+            const searchTerm = document.getElementById('search-reviews').value.toLowerCase();
+            const rows = document.querySelectorAll('#reviews-table-body tr');
             
             rows.forEach(row => {
-                const name = row.querySelector('td:first-child div').textContent.toLowerCase();
-                const email = row.querySelector('td:nth-child(2) div').textContent.toLowerCase();
+                if (row.cells.length < 2) return;
                 
-                row.style.display = name.includes(searchTerm) || email.includes(searchTerm) ? '' : 'none';
+                const user = row.cells[0].textContent.toLowerCase();
+                const destination = row.cells[1].textContent.toLowerCase();
+                
+                row.style.display = user.includes(searchTerm) || destination.includes(searchTerm) ? '' : 'none';
             });
         }
     </script>
