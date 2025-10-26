@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halaman Tidak Ditemukan - DARJO KU</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" type="image/png" href="foto/logo.png">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        *{
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .logo-glow {
+            filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5));
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px) scale(1.02);
+        }
+        
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .shine-effect::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(30deg);
+            transition: all 0.6s;
+            opacity: 0;
+        }
+        
+        .shine-effect:hover::before {
+            opacity: 1;
+            left: 100%;
+        }
+        
+        .delay-100 {
+            animation-delay: 0.1s;
+        }
+        
+        .delay-200 {
+            animation-delay: 0.2s;
+        }
+        
+        .delay-300 {
+            animation-delay: 0.3s;
+        }
+        
+        .delay-400 {
+            animation-delay: 0.4s;
+        }
+        
+        .delay-500 {
+            animation-delay: 0.5s;
+        }
+        
+        .logo-container {
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+        }
+
+        .error-illustration {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .error-code {
+            font-size: 8rem;
+            font-weight: 900;
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .error-code {
+                font-size: 6rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen flex flex-col">
+    <!-- Floating Background Blobs -->
+    <div class="fixed inset-0 -z-10 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 float-animation"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 float-animation" style="animation-delay: 1.5s;"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 float-animation" style="animation-delay: 3s;"></div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md py-4 px-6 shadow-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <!-- Logo & Brand -->
+            <div class="flex items-center space-x-3">
+                <div class="logo-glow">
+                    <div class="logo-container">
+                        <img src="foto/logo.png" alt="Logo" class="">
+                    </div>
+                </div>
+                <div class="text-2xl font-black">
+                    <span class="text-black">DARJO</span>
+                    <span class="bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent">KU</span>
+                </div>
+            </div>
+            
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="index.html" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Beranda</a>
+                <a href="index.html#destinasi" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Destinasi</a>
+                <a href="index.html#kuliner" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Kuliner</a>
+                <a href="index.html#acara" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">Acara</a>
+            </div>
+            
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-button" class="md:hidden text-gray-700">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4 border-t border-gray-200">
+            <div class="flex flex-col space-y-4 mt-4">
+                <a href="index.html" class="text-gray-700 hover:text-blue-600 font-medium">Beranda</a>
+                <a href="index.html#destinasi" class="text-gray-700 hover:text-blue-600 font-medium">Destinasi</a>
+                <a href="index.html#kuliner" class="text-gray-700 hover:text-blue-600 font-medium">Kuliner</a>
+                <a href="index.html#acara" class="text-gray-700 hover:text-blue-600 font-medium">Acara</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center py-16 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <!-- Error Code -->
+            <div class="error-code slide-in delay-100">404</div>
+            
+            <!-- Error Illustration -->
+            <div class="error-illustration mb-8 slide-in delay-200">
+                <svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
+                    <defs>
+                        <linearGradient id="BG" x1="19.496%" x2="77.479%" y1="71.822%" y2="16.69%">
+                            <stop offset="0%" stop-color="#3b82f6"></stop>
+                            <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"></stop>
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#BG)" fill-rule="nonzero" d="M0 198.78c0 41.458 14.945 79.236 39.539 107.786 28.214 32.765 69.128 53.365 114.734 53.434a148.44 148.44 0 0056.495-11.036c9.051-3.699 19.182-3.274 27.948 1.107a75.779 75.779 0 0033.957 8.01c5.023 0 9.942-.494 14.7-1.433 13.58-2.67 25.94-8.99 36.09-17.94 6.378-5.627 14.547-8.456 22.897-8.446h.142c27.589 0 53.215-8.732 74.492-23.696 19.021-13.36 34.554-31.696 44.904-53.224C474.92 234.58 480 213.388 480 190.958c0-76.93-59.774-139.305-133.498-139.305-7.516 0-14.88.663-22.063 1.899C305.418 21.42 271.355 0 232.499 0a103.651 103.651 0 00-45.88 10.661c-13.24 6.487-25.011 15.705-34.64 26.939-32.698.544-62.931 11.69-87.676 30.291C25.351 97.155 0 144.882 0 198.781z" opacity="0.2"></path>
+                    <path fill="#8b5cf6" d="M297.46 213.21c-4.61-1.16-8.76-3.49-12.13-6.95-3.37-3.46-5.69-7.62-6.85-12.23-1.16-4.61-1.09-9.44.21-14.01 1.3-4.57 3.83-8.74 7.41-12.05 3.58-3.31 8.04-5.65 12.92-6.82 4.88-1.17 9.99-1.14 14.86.08 4.87 1.22 9.33 3.7 12.97 7.15 3.64 3.45 6.33 7.75 7.83 12.52 1.5 4.77 1.75 9.85.72 14.75-1.03 4.9-3.27 9.46-6.48 13.26-3.21 3.8-7.27 6.71-11.82 8.47-4.55 1.76-9.43 2.3-14.22 1.57l-.22-.05zm-24.34 70.25a7.268 7.268 0 01-7.27-7.27 7.268 7.268 0 017.27-7.27 7.268 7.268 0 017.27 7.27 7.268 7.268 0 01-7.27 7.27z" opacity="0.24"></path>
+                    <path fill="#3b82f6" d="M218.37 244.63c-4.61-1.16-8.76-3.49-12.13-6.95-3.37-3.46-5.69-7.62-6.85-12.23-1.16-4.61-1.09-9.44.21-14.01 1.3-4.57 3.83-8.74 7.41-12.05 3.58-3.31 8.04-5.65 12.92-6.82 4.88-1.17 9.99-1.14 14.86.08 4.87 1.22 9.33 3.7 12.97 7.15 3.64 3.45 6.33 7.75 7.83 12.52 1.5 4.77 1.75 9.85.72 14.75-1.03 4.9-3.27 9.46-6.48 13.26-3.21 3.8-7.27 6.71-11.82 8.47-4.55 1.76-9.43 2.3-14.22 1.57l-.22-.05zm-24.34 70.25a7.268 7.268 0 01-7.27-7.27 7.268 7.268 0 017.27-7.27 7.268 7.268 0 017.27 7.27 7.268 7.268 0 01-7.27 7.27z" opacity="0.24"></path>
+                    <path fill="#8b5cf6" d="M297.46 213.21c-4.61-1.16-8.76-3.49-12.13-6.95-3.37-3.46-5.69-7.62-6.85-12.23-1.16-4.61-1.09-9.44.21-14.01 1.3-4.57 3.83-8.74 7.41-12.05 3.58-3.31 8.04-5.65 12.92-6.82 4.88-1.17 9.99-1.14 14.86.08 4.87 1.22 9.33 3.7 12.97 7.15 3.64 3.45 6.33 7.75 7.83 12.52 1.5 4.77 1.75 9.85.72 14.75-1.03 4.9-3.27 9.46-6.48 13.26-3.21 3.8-7.27 6.71-11.82 8.47-4.55 1.76-9.43 2.3-14.22 1.57l-.22-.05z"></path>
+                    <path fill="#3b82f6" d="M218.37 244.63c-4.61-1.16-8.76-3.49-12.13-6.95-3.37-3.46-5.69-7.62-6.85-12.23-1.16-4.61-1.09-9.44.21-14.01 1.3-4.57 3.83-8.74 7.41-12.05 3.58-3.31 8.04-5.65 12.92-6.82 4.88-1.17 9.99-1.14 14.86.08 4.87 1.22 9.33 3.7 12.97 7.15 3.64 3.45 6.33 7.75 7.83 12.52 1.5 4.77 1.75 9.85.72 14.75-1.03 4.9-3.27 9.46-6.48 13.26-3.21 3.8-7.27 6.71-11.82 8.47-4.55 1.76-9.43 2.3-14.22 1.57l-.22-.05z"></path>
+                    <path fill="#6c63ff" d="M348.27 297.54H155.67c-4.66 0-8.45-3.79-8.45-8.45s3.79-8.45 8.45-8.45h192.6c4.66 0 8.45 3.79 8.45 8.45s-3.79 8.45-8.45 8.45z"></path>
+                    <circle cx="194.64" cy="289.09" r="8.45" fill="#6c63ff"></circle>
+                    <circle cx="223.15" cy="289.09" r="8.45" fill="#6c63ff"></circle>
+                    <circle cx="251.66" cy="289.09" r="8.45" fill="#6c63ff"></circle>
+                    <path fill="#f0f0f0" d="M194.64 280.64a8.45 8.45 0 018.45 8.45h-16.9a8.45 8.45 0 018.45-8.45z"></path>
+                    <path fill="#f0f0f0" d="M223.15 280.64a8.45 8.45 0 018.45 8.45h-16.9a8.45 8.45 0 018.45-8.45z"></path>
+                    <path fill="#f0f0f0" d="M251.66 280.64a8.45 8.45 0 018.45 8.45h-16.9a8.45 8.45 0 018.45-8.45z"></path>
+                    <circle cx="280.17" cy="289.09" r="8.45" fill="#6c63ff"></circle>
+                    <circle cx="308.68" cy="289.09" r="8.45" fill="#6c63ff"></circle>
+                    <circle cx="337.19" cy="289.09" r="8.45" fill="#6c63ff"></circle>
+                    <path fill="#f0f0f0" d="M280.17 280.64a8.45 8.45 0 018.45 8.45h-16.9a8.45 8.45 0 018.45-8.45z"></path>
+                    <path fill="#f0f0f0" d="M308.68 280.64a8.45 8.45 0 018.45 8.45h-16.9a8.45 8.45 0 018.45-8.45z"></path>
+                    <path fill="#f0f0f0" d="M337.19 280.64a8.45 8.45 0 018.45 8.45h-16.9a8.45 8.45 0 018.45-8.45z"></path>
+                    <path fill="#ffb8b8" d="M175.89 345.57l-12.26-12.26 8.67-8.67 12.26 12.26-8.67 8.67z"></path>
+                    <path fill="#3b82f6" d="M164.63 333.31l17.34-17.34 8.67 8.67-17.34 17.34-8.67-8.67z"></path>
+                    <path fill="#ffb8b8" d="M324.11 345.57l12.26-12.26-8.67-8.67-12.26 12.26 8.67 8.67z"></path>
+                    <path fill="#3b82f6" d="M335.37 333.31l-17.34-17.34-8.67 8.67 17.34 17.34 8.67-8.67z"></path>
+                    <circle cx="250" cy="200" r="120" fill="#f0f0f0"></circle>
+                    <path fill="#3b82f6" d="M250 80c-66.27 0-120 53.73-120 120s53.73 120 120 120 120-53.73 120-120S316.27 80 250 80zm0 220c-55.23 0-100-44.77-100-100s44.77-100 100-100 100 44.77 100 100-44.77 100-100 100z"></path>
+                    <path fill="#3b82f6" d="M250 140c-33.14 0-60 26.86-60 60s26.86 60 60 60 60-26.86 60-60-26.86-60-60-60zm0 100c-22.09 0-40-17.91-40-40s17.91-40 40-40 40 17.91 40 40-17.91 40-40 40z"></path>
+                    <circle cx="250" cy="200" r="20" fill="#3b82f6"></circle>
+                    <path fill="#3b82f6" d="M250 180c11.05 0 20 8.95 20 20s-8.95 20-20 20-20-8.95-20-20 8.95-20 20-20z"></path>
+                    <path fill="#3b82f6" d="M250 190c5.52 0 10 4.48 10 10s-4.48 10-10 10-10-4.48-10-10 4.48-10 10-10z"></path>
+                </svg>
+            </div>
+            
+            <!-- Error Message -->
+            <h1 class="text-3xl md:text-4xl font-black text-gray-900 mb-4 slide-in delay-300">
+                Halaman Tidak Ditemukan
+            </h1>
+            
+            <p class="text-lg text-gray-700 mb-8 max-w-2xl mx-auto slide-in delay-400">
+                Maaf, halaman yang Anda cari tidak dapat ditemukan. Mungkin halaman tersebut telah dipindahkan, dihapus, atau Anda salah mengetik URL.
+            </p>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center slide-in delay-500">
+                <a href="index.html" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-8 rounded-full transition-colors shadow-md text-center">
+                    <i class="fas fa-home mr-2"></i>Kembali ke Beranda
+                </a>
+                
+            </div>
+            
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 bg-gray-900 text-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Logo & About -->
+                <div class="md:col-span-2">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="logo-glow">
+                            <div class="logo-container">
+                                <img src="foto/logo.png" alt="Logo" class="">
+                            </div>
+                        </div>
+                        <div class="text-2xl font-black">
+                            <span>DARJO</span>
+                            <span class="text-blue-400">KU</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        Platform wisata dan kuliner Sidoarjo terpercaya. Temukan destinasi menarik dan makanan khas dengan informasi terupdate.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-facebook text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-whatsapp text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fab fa-youtube text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Tautan Cepat</h3>
+                    <ul class="space-y-2">
+                        <li><a href="index.html#destinasi" class="text-gray-400 hover:text-white transition-colors">Destinasi Wisata</a></li>
+                        <li><a href="index.html#kuliner" class="text-gray-400 hover:text-white transition-colors">Kuliner Khas</a></li>
+                        <li><a href="index.html#acara" class="text-gray-400 hover:text-white transition-colors">Acara & Event</a></li>
+                        <li><a href="index.html#tentang" class="text-gray-400 hover:text-white transition-colors">Tentang Kami</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Kontak</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2"></i>
+                            <a href="mailto:info@darjoku.id" class="hover:text-white">info@darjoku.id</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone mr-2"></i>
+                            <a href="tel:+62312345678" class="hover:text-white">(031) 234-5678</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            <span>Jl. Raya Sidoarjo No.123</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
+                <p>© 2025 DARJO KU - Platform Wisata & Kuliner Sidoarjo. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Go Back Button
+        document.getElementById('go-back-btn').addEventListener('click', function() {
+            window.history.back();
+        });
+
+        // Search functionality
+        document.getElementById('error-search-btn').addEventListener('click', function() {
+            const query = document.getElementById('error-search-input').value;
+            if (query.trim()) {
+                window.location.href = `index.html#search?q=${encodeURIComponent(query)}`;
+            }
+        });
+
+        document.getElementById('error-search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const query = this.value;
+                if (query.trim()) {
+                    window.location.href = `index.html#search?q=${encodeURIComponent(query)}`;
+                }
+            }
+        });
+
+        // Slide-in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('slide-in');
+                }
+            });
+        }, observerOptions);
+        
+        // Observe elements for slide-in animation
+        document.querySelectorAll('.slide-in').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
