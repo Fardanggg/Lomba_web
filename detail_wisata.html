@@ -675,7 +675,7 @@
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
+   <script>
         // Supabase Configuration
         const SUPABASE_URL = 'https://swnmxpknfxcolfohexup.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bm14cGtuZnhjb2xmb2hleHVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyOTc1NDEsImV4cCI6MjA3Njg3MzU0MX0.V0pZMXn-EXUZlKcilT-ZZXbIWLFCEfHDDik7qWUDeWk';
@@ -884,15 +884,19 @@
             // Gallery tab
             const galleryContainer = document.getElementById('gallery-container');
             
-            // If you have multiple images in database, you would loop through them
-            // For now, we'll use the main image and some placeholder images
+            // Create array of images from database columns
             const galleryImages = [
                 destination.image_url,
-                'https://images.unsplash.com/photo-1597074861083-53dcc51af916?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-                'https://images.unsplash.com/photo-1551135049-8a33b5883817?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-                'https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'
-            ];
-            
+                destination.image_url_2,
+                destination.image_url_3,
+                destination.image_url_4
+            ].filter(url => url); // Filter out any null/undefined values
+
+            // If no additional images, use the main image as fallback
+            if (galleryImages.length === 0 && destination.image_url) {
+                galleryImages.push(destination.image_url);
+            }
+
             galleryImages.forEach((imageUrl, index) => {
                 const galleryItem = document.createElement('div');
                 galleryItem.className = 'gallery-item';
