@@ -194,6 +194,41 @@
             border-radius: 8px;
             margin-top: 5px;
         }
+        
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 8px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            transition: all 0.2s;
+        }
+        
+        .checkbox-item:hover {
+            border-color: #3b82f6;
+            background: #f8fafc;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            border: 2px solid #d1d5db;
+        }
+        
+        .checkbox-item input[type="checkbox"]:checked {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -537,6 +572,21 @@
         const modalClose = document.getElementById('modal-close');
         const modalCancel = document.getElementById('modal-cancel');
         const modalSave = document.getElementById('modal-save');
+
+        // Data untuk fasilitas dan aktivitas
+        const FACILITIES_DATA = [
+            'Area Parkir Luas',
+            'Spot Foto Instagenik', 
+            'Warung Makan Terdekat',
+            'Toilet Umum'
+        ];
+
+        const ACTIVITIES_DATA = [
+            'Foto & Dokumentasi',
+            'Edukasi Sejarah',
+            'Jalan-jalan Santai',
+            'Wisata Keluarga'
+        ];
 
         // Initialize the admin panel
         document.addEventListener('DOMContentLoaded', function() {
@@ -1126,6 +1176,22 @@
                         <input type="url" id="image_url_4" name="image_url_4" class="form-input">
                         <div id="preview-image_url_4" class="mt-2"></div>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">Fasilitas</label>
+                        <div class="border rounded-lg p-4 bg-gray-50">
+                            <div class="checkbox-grid">
+                                ${generateFacilitiesCheckboxes()}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Aktivitas</label>
+                        <div class="border rounded-lg p-4 bg-gray-50">
+                            <div class="checkbox-grid">
+                                ${generateActivitiesCheckboxes()}
+                            </div>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="form-group">
                             <label class="form-label" for="rating">Rating</label>
@@ -1213,6 +1279,42 @@
             }
         }
 
+        // Generate facilities checkboxes
+        function generateFacilitiesCheckboxes(selectedFacilities = null) {
+            let html = '';
+            FACILITIES_DATA.forEach(facility => {
+                const isChecked = selectedFacilities ? 
+                    (Array.isArray(selectedFacilities) ? selectedFacilities.includes(facility) : true) : true;
+                
+                html += `
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="facilities" value="${facility}" 
+                               ${isChecked ? 'checked' : ''}>
+                        <span class="text-sm">${facility}</span>
+                    </label>
+                `;
+            });
+            return html;
+        }
+
+        // Generate activities checkboxes
+        function generateActivitiesCheckboxes(selectedActivities = null) {
+            let html = '';
+            ACTIVITIES_DATA.forEach(activity => {
+                const isChecked = selectedActivities ? 
+                    (Array.isArray(selectedActivities) ? selectedActivities.includes(activity) : true) : true;
+                
+                html += `
+                    <label class="checkbox-item">
+                        <input type="checkbox" name="activities" value="${activity}" 
+                               ${isChecked ? 'checked' : ''}>
+                        <span class="text-sm">${activity}</span>
+                    </label>
+                `;
+            });
+            return html;
+        }
+
         // Setup image previews for destination form
         function setupImagePreviews() {
             const imageFields = ['image_url', 'image_url_2', 'image_url_3', 'image_url_4'];
@@ -1278,6 +1380,31 @@
                 
                 if (type === 'destination') {
                     title = 'Edit Destinasi Wisata';
+                    
+                    // Parse facilities dan activities dari database
+                    let facilities = [];
+                    let activities = [];
+                    
+                    try {
+                        if (Array.isArray(item.facilities)) {
+                            facilities = item.facilities;
+                        } else if (typeof item.facilities === 'string') {
+                            facilities = JSON.parse(item.facilities);
+                        }
+                    } catch (e) {
+                        facilities = FACILITIES_DATA;
+                    }
+                    
+                    try {
+                        if (Array.isArray(item.activities)) {
+                            activities = item.activities;
+                        } else if (typeof item.activities === 'string') {
+                            activities = JSON.parse(item.activities);
+                        }
+                    } catch (e) {
+                        activities = ACTIVITIES_DATA;
+                    }
+                    
                     formHTML = `
                         <div class="form-group">
                             <label class="form-label" for="name">Nama Destinasi</label>
@@ -1321,6 +1448,22 @@
                             <input type="url" id="image_url_4" name="image_url_4" value="${item.image_url_4 || ''}" class="form-input">
                             <div id="preview-image_url_4" class="mt-2">
                                 ${item.image_url_4 ? `<img src="${item.image_url_4}" alt="Preview" class="image-preview">` : ''}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Fasilitas</label>
+                            <div class="border rounded-lg p-4 bg-gray-50">
+                                <div class="checkbox-grid">
+                                    ${generateFacilitiesCheckboxes(facilities)}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Aktivitas</label>
+                            <div class="border rounded-lg p-4 bg-gray-50">
+                                <div class="checkbox-grid">
+                                    ${generateActivitiesCheckboxes(activities)}
+                                </div>
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
@@ -1438,10 +1581,19 @@
             if (data.latitude) data.latitude = parseFloat(data.latitude);
             if (data.longitude) data.longitude = parseFloat(data.longitude);
             
-            // Clean up empty image URLs
-            if (data.image_url_2 === '') delete data.image_url_2;
-            if (data.image_url_3 === '') delete data.image_url_3;
-            if (data.image_url_4 === '') delete data.image_url_4;
+            // Process facilities and activities from checkboxes
+            if (currentEditingType === 'destination') {
+                const facilityCheckboxes = modalForm.querySelectorAll('input[name="facilities"]:checked');
+                const activityCheckboxes = modalForm.querySelectorAll('input[name="activities"]:checked');
+                
+                data.facilities = Array.from(facilityCheckboxes).map(cb => cb.value);
+                data.activities = Array.from(activityCheckboxes).map(cb => cb.value);
+                
+                // Clean up empty image URLs
+                if (data.image_url_2 === '') delete data.image_url_2;
+                if (data.image_url_3 === '') delete data.image_url_3;
+                if (data.image_url_4 === '') delete data.image_url_4;
+            }
             
             try {
                 let result;

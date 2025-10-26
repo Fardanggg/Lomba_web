@@ -675,782 +675,834 @@
     </footer>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-   <script>
-        // Supabase Configuration
-        const SUPABASE_URL = 'https://swnmxpknfxcolfohexup.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bm14cGtuZnhjb2xmb2hleHVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyOTc1NDEsImV4cCI6MjA3Njg3MzU0MX0.V0pZMXn-EXUZlKcilT-ZZXbIWLFCEfHDDik7qWUDeWk';
+  <script>
+    // Supabase Configuration
+    const SUPABASE_URL = 'https://swnmxpknfxcolfohexup.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bm14cGtuZnhjb2xmb2hleHVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyOTc1NDEsImV4cCI6MjA3Njg3MzU0MX0.V0pZMXn-EXUZlKcilT-ZZXbIWLFCEfHDDik7qWUDeWk';
+    
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Global variables
+    let map;
+    let userMarker;
+    let destinationMarker;
+    let currentDestinationId;
+    let currentReviews = [];
+    let reviewsOffset = 0;
+    const REVIEWS_PER_PAGE = 5;
+    
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get destination ID from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        currentDestinationId = urlParams.get('id');
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        // Global variables
-        let map;
-        let userMarker;
-        let destinationMarker;
-        let currentDestinationId;
-        let currentReviews = [];
-        let reviewsOffset = 0;
-        const REVIEWS_PER_PAGE = 5;
-        
-        // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get destination ID from URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            currentDestinationId = urlParams.get('id');
-            
-            if (!currentDestinationId) {
-                // Redirect to home if no ID provided
-                window.location.href = 'index.html';
-                return;
-            }
-            
-            // Load destination data
-            loadDestinationData(currentDestinationId);
-            
-            // Initialize map
-            initMap();
-            
-            // Set up event listeners
-            setupEventListeners();
-            
-            // Track page view
-            trackPageView(currentDestinationId);
-        });
-        
-        // Set up event listeners
-        function setupEventListeners() {
-            // Tab switching
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const tabId = button.getAttribute('data-tab');
-                    
-                    // Remove active class from all tabs and contents
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    tabContents.forEach(content => content.classList.remove('active'));
-                    
-                    // Add active class to selected tab and content
-                    button.classList.add('active');
-                    document.getElementById(tabId).classList.add('active');
-                    
-                    // If maps tab is selected, adjust map size
-                    if (tabId === 'maps') {
-                        setTimeout(() => {
-                            if (map) map.invalidateSize();
-                        }, 300);
-                    }
-                    
-                    // Load content for tabs that need dynamic data
-                    if (tabId === 'nearby') {
-                        loadNearbyDestinations();
-                    }
-                });
-            });
-            
-            // Review form
-            document.getElementById('add-review-btn').addEventListener('click', () => {
-                document.getElementById('review-form-container').style.display = 'block';
-            });
-            
-            document.getElementById('cancel-review-btn').addEventListener('click', () => {
-                document.getElementById('review-form-container').style.display = 'none';
-                document.getElementById('review-form').reset();
-            });
-            
-            document.getElementById('review-form').addEventListener('submit', submitReview);
-            
-            // Load more reviews
-            document.getElementById('load-more-reviews').addEventListener('click', loadMoreReviews);
-            
-            // Floating action buttons
-            document.getElementById('location-btn').addEventListener('click', getUserLocation);
-            document.getElementById('direction-btn').addEventListener('click', addRoute);
-            document.getElementById('call-btn').addEventListener('click', () => {
-                const phone = document.getElementById('contact-phone').textContent;
-                window.location.href = `tel:${phone}`;
-            });
-            
-            // Share button
-            document.getElementById('share-btn').addEventListener('click', shareDestination);
-            
-            // Save button
-            document.getElementById('save-btn').addEventListener('click', toggleFavorite);
-            
-            // Directions button
-            document.getElementById('directions-btn').addEventListener('click', addRoute);
+        if (!currentDestinationId) {
+            // Redirect to home if no ID provided
+            window.location.href = 'index.html';
+            return;
         }
         
-        // Load destination data from Supabase
-        async function loadDestinationData(destinationId) {
-            try {
-                // Get destination details
-                const { data: destination, error } = await supabase
-                    .from('destinations')
-                    .select('*')
-                    .eq('id', destinationId)
-                    .single();
-                
-                if (error) {
-                    throw error;
-                }
-                
-                // Populate page with destination data
-                populateDestinationData(destination);
-                
-                // Load destination reviews
-                loadReviews(destinationId);
-                
-                // Load destination visits stats
-                loadVisitStats(destinationId);
-                
-                // Check if destination is in user's favorites
-                checkIfFavorite(destinationId);
-                
-            } catch (error) {
-                console.error('Error loading destination:', error);
-                alert('Terjadi kesalahan saat memuat data destinasi');
-            }
-        }
-        
-        // Populate page with destination data
-        function populateDestinationData(destination) {
-            // Hero section
-            document.getElementById('destination-hero').style.backgroundImage = `url('${destination.image_url}')`;
-            document.getElementById('destination-name').textContent = destination.name;
-            document.getElementById('destination-description').textContent = destination.description;
-            document.getElementById('destination-location').textContent = 'Sidoarjo, Jawa Timur';
-            
-            // Rating
-            updateRatingDisplay(destination.rating, destination.review_count);
-            
-            // Overview tab
-            document.getElementById('overview-title').textContent = `Tentang ${destination.name}`;
-            document.getElementById('overview-description').textContent = destination.description;
-            
-            // Facilities and activities
-            const facilitiesList = document.getElementById('facilities-list');
-            const activitiesList = document.getElementById('activities-list');
-            const tipsList = document.getElementById('tips-list');
-            
-            // These would typically come from the database
-            const facilities = ['Area Parkir Luas', 'Spot Foto Instagenik', 'Warung Makan Terdekat', 'Toilet Umum'];
-            const activities = ['Foto & Dokumentasi', 'Edukasi Sejarah', 'Jalan-jalan Santai', 'Wisata Keluarga'];
-            const tips = [
-                'Bawa kamera untuk mengabadikan momen di spot-spot foto yang menarik',
-                'Kunjungi pada pagi atau sore hari untuk menghindari panas terik',
-                'Pelajari sejarah destinasi sebelum berkunjung untuk pengalaman yang lebih bermakna',
-                'Gunakan pakaian yang nyaman karena area destinasi cukup terbuka'
-            ];
-            
-            facilities.forEach(facility => {
-                const li = document.createElement('li');
-                li.className = 'flex items-center';
-                li.innerHTML = `<i class="fas fa-check text-green-500 mr-3"></i><span>${facility}</span>`;
-                facilitiesList.appendChild(li);
-            });
-            
-            activities.forEach(activity => {
-                const li = document.createElement('li');
-                li.className = 'flex items-center';
-                li.innerHTML = `<i class="fas fa-check text-green-500 mr-3"></i><span>${activity}</span>`;
-                activitiesList.appendChild(li);
-            });
-            
-            tips.forEach(tip => {
-                const li = document.createElement('li');
-                li.textContent = tip;
-                tipsList.appendChild(li);
-            });
-            
-            // Maps tab
-            document.getElementById('destination-address').textContent = destination.address || 'Jl. Raya Porong, Kec. Porong, Kabupaten Sidoarjo, Jawa Timur';
-            
-            // Transportation
-            const transportationList = document.getElementById('transportation-list');
-            const transportOptions = [
-                { icon: 'bus', text: 'Bus: Angkutan Porong - Sidoarjo' },
-                { icon: 'motorcycle', text: 'Ojek Online: Tersedia' },
-                { icon: 'car', text: 'Parkir: Tersedia (Gratis)' }
-            ];
-            
-            transportOptions.forEach(transport => {
-                const li = document.createElement('li');
-                li.className = 'flex items-center';
-                li.innerHTML = `<i class="fas fa-${transport.icon} text-blue-500 mr-3"></i><span>${transport.text}</span>`;
-                transportationList.appendChild(li);
-            });
-            
-            // Gallery tab
-            const galleryContainer = document.getElementById('gallery-container');
-            
-            // Create array of images from database columns
-            const galleryImages = [
-                destination.image_url,
-                destination.image_url_2,
-                destination.image_url_3,
-                destination.image_url_4
-            ].filter(url => url); // Filter out any null/undefined values
-
-            // If no additional images, use the main image as fallback
-            if (galleryImages.length === 0 && destination.image_url) {
-                galleryImages.push(destination.image_url);
-            }
-
-            galleryImages.forEach((imageUrl, index) => {
-                const galleryItem = document.createElement('div');
-                galleryItem.className = 'gallery-item';
-                galleryItem.innerHTML = `<img src="${imageUrl}" alt="${destination.name} - Foto ${index + 1}">`;
-                galleryContainer.appendChild(galleryItem);
-            });
-            
-            // Set up gallery modal
-            setupGalleryModal();
-            
-            // Sidebar information
-            document.getElementById('operating-hours').textContent = destination.operating_hours || '24 Jam';
-            document.getElementById('entry-fee').textContent = destination.entry_fee === 0 ? 'Gratis' : `Rp ${destination.entry_fee.toLocaleString()}`;
-            document.getElementById('visit-duration').textContent = destination.visit_duration || '1-2 Jam';
-            document.getElementById('destination-category').textContent = getCategoryName(destination.category);
-            document.getElementById('contact-phone').textContent = destination.contact_phone || '(031) 8965432';
-            document.getElementById('contact-email').textContent = destination.contact_email || 'info@destinasi.sda';
-            document.getElementById('contact-website').textContent = destination.website || 'www.destinasi.sda.go.id';
-            
-            // Update map with destination coordinates
-            if (destination.latitude && destination.longitude) {
-                updateMap([destination.latitude, destination.longitude]);
-            } else {
-                // Default coordinates for Sidoarjo
-                updateMap([-7.5309, 112.7049]);
-            }
-        }
-        
-        // Update rating display
-        function updateRatingDisplay(rating, reviewCount) {
-            const ratingElement = document.getElementById('destination-rating');
-            const averageRatingElement = document.getElementById('average-rating');
-            const averageRatingStars = document.getElementById('average-rating-stars');
-            const sidebarRating = document.getElementById('sidebar-rating');
-            const reviewsCountElement = document.getElementById('reviews-count');
-            
-            // Format rating to one decimal place
-            const formattedRating = parseFloat(rating).toFixed(1);
-            
-            // Update rating in various places
-            ratingElement.innerHTML = `
-                <div class="flex star-rating">
-                    ${generateStars(rating)}
-                </div>
-                <span class="font-semibold">${formattedRating}</span>
-                <span class="text-blue-200">(${reviewCount} ulasan)</span>
-            `;
-            
-            averageRatingElement.textContent = formattedRating;
-            averageRatingStars.innerHTML = generateStars(rating);
-            sidebarRating.textContent = formattedRating;
-            reviewsCountElement.textContent = `Berdasarkan ${reviewCount} ulasan`;
-        }
-        
-        // Generate star HTML based on rating
-        function generateStars(rating) {
-            let stars = '';
-            const fullStars = Math.floor(rating);
-            const hasHalfStar = rating % 1 >= 0.5;
-            
-            for (let i = 0; i < fullStars; i++) {
-                stars += '<i class="fas fa-star"></i>';
-            }
-            
-            if (hasHalfStar) {
-                stars += '<i class="fas fa-star-half-alt"></i>';
-            }
-            
-            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-            for (let i = 0; i < emptyStars; i++) {
-                stars += '<i class="far fa-star"></i>';
-            }
-            
-            return stars;
-        }
-        
-        // Get category name
-        function getCategoryName(category) {
-            const categories = {
-                'wisata-alam': 'Wisata Alam',
-                'wisata-sejarah': 'Wisata Sejarah',
-                'wisata-keluarga': 'Wisata Keluarga'
-            };
-            return categories[category] || category;
-        }
+        // Load destination data
+        loadDestinationData(currentDestinationId);
         
         // Initialize map
-        function initMap() {
-            // Default coordinates (Sidoarjo)
-            const defaultCoords = [-7.4478, 112.7183];
-            
-            // Initialize map
-            map = L.map('map').setView(defaultCoords, 13);
-            
-            // Add tile layer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-            
-            // Try to get user location
-            getUserLocation();
-        }
+        initMap();
         
-        // Update map with destination coordinates
-        function updateMap(coords) {
-            // Remove existing destination marker
-            if (destinationMarker) {
-                map.removeLayer(destinationMarker);
-            }
-            
-            // Add destination marker
-            destinationMarker = L.marker(coords)
-                .addTo(map)
-                .bindPopup(document.getElementById('destination-name').textContent)
-                .openPopup();
-            
-            // If we have user location, calculate distance
-            if (userMarker) {
-                const userCoords = userMarker.getLatLng();
-                calculateDistance([userCoords.lat, userCoords.lng], coords);
-                
-                // Adjust map view to show both locations
-                const bounds = L.latLngBounds([userCoords, coords]);
-                map.fitBounds(bounds, { padding: [20, 20] });
-            } else {
-                // Just focus on destination
-                map.setView(coords, 15);
-            }
-        }
-        
-        // Get user location
-        function getUserLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        const userCoords = [position.coords.latitude, position.coords.longitude];
-                        
-                        // Remove existing user marker
-                        if (userMarker) {
-                            map.removeLayer(userMarker);
-                        }
-                        
-                        // Add user marker
-                        userMarker = L.marker(userCoords, {
-                            icon: L.divIcon({
-                                className: 'user-location-marker',
-                                html: '<div style="background-color: #3b82f6; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>',
-                                iconSize: [20, 20],
-                                iconAnchor: [10, 10]
-                            })
-                        }).addTo(map)
-                        .bindPopup('Lokasi Anda')
-                        .openPopup();
-                        
-                        // Calculate distance if we have destination coordinates
-                        if (destinationMarker) {
-                            const destCoords = destinationMarker.getLatLng();
-                            calculateDistance(userCoords, [destCoords.lat, destCoords.lng]);
-                            
-                            // Adjust map view to show both locations
-                            const bounds = L.latLngBounds([userCoords, [destCoords.lat, destCoords.lng]]);
-                            map.fitBounds(bounds, { padding: [20, 20] });
-                        }
-                    },
-                    function(error) {
-                        console.error("Error getting location: ", error);
-                        document.getElementById('distance-info').innerHTML = '<i class="fas fa-road"></i><span>Gagal mendapatkan lokasi</span>';
-                    }
-                );
-            } else {
-                alert("Geolocation tidak didukung oleh browser ini.");
-            }
-        }
-        
-        // Calculate distance between two coordinates
-        function calculateDistance(coord1, coord2) {
-            // Using Haversine formula to calculate distance
-            const R = 6371; // Earth radius in km
-            const dLat = (coord2[0] - coord1[0]) * Math.PI / 180;
-            const dLon = (coord2[1] - coord1[1]) * Math.PI / 180;
-            const a = 
-                Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(coord1[0] * Math.PI / 180) * Math.cos(coord2[0] * Math.PI / 180) * 
-                Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            const distance = R * c;
-            
-            // Display distance
-            document.getElementById('distance-info').innerHTML = 
-                `<i class="fas fa-road"></i><span>${distance.toFixed(1)} km dari lokasi Anda</span>`;
-        }
-        
-        // Add route from user location to destination
-        function addRoute() {
-            if (!userMarker) {
-                alert("Silakan aktifkan izin lokasi terlebih dahulu");
-                getUserLocation();
-                return;
-            }
-            
-            const userCoords = userMarker.getLatLng();
-            const destinationCoords = destinationMarker.getLatLng();
-            
-            // Open directions in Google Maps
-            const url = `https://www.google.com/maps/dir/?api=1&origin=${userCoords.lat},${userCoords.lng}&destination=${destinationCoords.lat},${destinationCoords.lng}&travelmode=driving`;
-            window.open(url, '_blank');
-        }
-        
-        // Set up gallery modal
-        function setupGalleryModal() {
-            const galleryItems = document.querySelectorAll('.gallery-item');
-            const modal = document.getElementById('image-modal');
-            const modalImage = document.getElementById('modal-image');
-            const modalClose = document.querySelector('.modal-close');
-            
-            galleryItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    const imgSrc = item.querySelector('img').getAttribute('src');
-                    modalImage.setAttribute('src', imgSrc);
-                    modal.style.display = 'flex';
-                });
-            });
-            
-            modalClose.addEventListener('click', () => {
-                modal.style.display = 'none';
-            });
-            
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
-        }
-        
-        // Load reviews from Supabase
-        async function loadReviews(destinationId, offset = 0) {
-            try {
-                const { data: reviews, error } = await supabase
-                    .from('reviews')
-                    .select(`
-                        *,
-                        users (
-                            name,
-                            avatar_url
-                        )
-                    `)
-                    .eq('destination_id', destinationId)
-                    .order('created_at', { ascending: false })
-                    .range(offset, offset + REVIEWS_PER_PAGE - 1);
-                
-                if (error) {
-                    throw error;
-                }
-                
-                if (offset === 0) {
-                    currentReviews = reviews;
-                } else {
-                    currentReviews = [...currentReviews, ...reviews];
-                }
-                
-                displayReviews(currentReviews);
-                
-                // Hide load more button if we have less than REVIEWS_PER_PAGE reviews
-                if (reviews.length < REVIEWS_PER_PAGE) {
-                    document.getElementById('load-more-reviews').style.display = 'none';
-                } else {
-                    document.getElementById('load-more-reviews').style.display = 'block';
-                }
-                
-            } catch (error) {
-                console.error('Error loading reviews:', error);
-            }
-        }
-        
-        // Load more reviews
-        function loadMoreReviews() {
-            reviewsOffset += REVIEWS_PER_PAGE;
-            loadReviews(currentDestinationId, reviewsOffset);
-        }
-        
-        // Display reviews
-        function displayReviews(reviews) {
-            const container = document.getElementById('reviews-container');
-            
-            if (reviews.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-500 py-4">Belum ada ulasan untuk destinasi ini.</p>';
-                return;
-            }
-            
-            // Clear container if we're loading the first page
-            if (reviewsOffset === 0) {
-                container.innerHTML = '';
-            }
-            
-            reviews.forEach(review => {
-                const reviewCard = document.createElement('div');
-                reviewCard.className = 'review-card bg-white p-4 rounded-xl border-l-4 border-blue-500';
-                
-                const reviewDate = new Date(review.created_at).toLocaleDateString('id-ID', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-                
-                reviewCard.innerHTML = `
-                    <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <h4 class="font-bold">${review.users.name}</h4>
-                            <div class="flex items-center mt-1">
-                                <div class="flex star-rating mr-2">
-                                    ${generateStars(review.rating)}
-                                </div>
-                                <span class="text-sm text-gray-500">${reviewDate}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <p class="text-gray-700">${review.comment}</p>
-                `;
-                
-                container.appendChild(reviewCard);
-            });
-        }
-        
-        // Submit review
-        async function submitReview(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(e.target);
-            const rating = parseInt(formData.get('rating'));
-            const comment = formData.get('comment');
-            
-            if (!rating) {
-                alert('Silakan beri rating terlebih dahulu');
-                return;
-            }
-            
-            if (!comment.trim()) {
-                alert('Silakan tulis komentar terlebih dahulu');
-                return;
-            }
-            
-            try {
-                // In a real app, you would have user authentication
-                // For demo purposes, we'll use a placeholder user ID
-                const userId = 1; // This should come from your auth system
-                
-                const { data, error } = await supabase
-                    .from('reviews')
-                    .insert([
-                        {
-                            destination_id: currentDestinationId,
-                            user_id: userId,
-                            rating: rating,
-                            comment: comment
-                        }
-                    ]);
-                
-                if (error) {
-                    throw error;
-                }
-                
-                // Hide form and reset
-                document.getElementById('review-form-container').style.display = 'none';
-                document.getElementById('review-form').reset();
-                
-                // Reload reviews and destination data to update rating
-                loadReviews(currentDestinationId);
-                loadDestinationData(currentDestinationId);
-                
-                alert('Ulasan berhasil dikirim!');
-                
-            } catch (error) {
-                console.error('Error submitting review:', error);
-                alert('Terjadi kesalahan saat mengirim ulasan');
-            }
-        }
-        
-        // Load nearby destinations
-        async function loadNearbyDestinations() {
-            try {
-                const { data: destinations, error } = await supabase
-                    .from('destinations')
-                    .select('*')
-                    .neq('id', currentDestinationId)
-                    .limit(4);
-                
-                if (error) {
-                    throw error;
-                }
-                
-                displayNearbyDestinations(destinations || []);
-                
-            } catch (error) {
-                console.error('Error loading nearby destinations:', error);
-            }
-        }
-        
-        // Display nearby destinations
-        function displayNearbyDestinations(destinations) {
-            const container = document.getElementById('nearby-container');
-            container.innerHTML = '';
-            
-            if (destinations.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-500 col-span-2">Tidak ada destinasi terdekat lainnya.</p>';
-                return;
-            }
-            
-            destinations.forEach(destination => {
-                const card = document.createElement('div');
-                card.className = 'bg-white rounded-xl overflow-hidden shadow-sm card-hover';
-                
-                card.innerHTML = `
-                    <div class="h-40 bg-cover bg-center" style="background-image: url('${destination.image_url}')"></div>
-                    <div class="p-4">
-                        <h3 class="font-bold text-lg mb-2">${destination.name}</h3>
-                        <p class="text-gray-600 text-sm mb-3">${destination.description.substring(0, 100)}...</p>
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center">
-                                <div class="flex star-rating text-sm mr-2">
-                                    ${generateStars(destination.rating)}
-                                </div>
-                                <span class="text-sm font-semibold">${parseFloat(destination.rating).toFixed(1)}</span>
-                            </div>
-                            <a href="detail_wisata.html?id=${destination.id}" class="text-sm text-blue-500 font-semibold hover:text-blue-700">
-                                Lihat Detail
-                            </a>
-                        </div>
-                    </div>
-                `;
-                
-                container.appendChild(card);
-            });
-        }
+        // Set up event listeners
+        setupEventListeners();
         
         // Track page view
-        async function trackPageView(destinationId) {
-            try {
-                const { data, error } = await supabase
-                    .from('page_views')
-                    .insert([
-                        {
-                            destination_id: destinationId,
-                            user_agent: navigator.userAgent,
-                            ip_address: '' // In a real app, you would get this from your backend
-                        }
-                    ]);
+        trackPageView(currentDestinationId);
+    });
+    
+    // Set up event listeners
+    function setupEventListeners() {
+        // Tab switching
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.getAttribute('data-tab');
                 
-                if (error) {
-                    console.error('Error tracking page view:', error);
+                // Remove active class from all tabs and contents
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Add active class to selected tab and content
+                button.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+                
+                // If maps tab is selected, adjust map size
+                if (tabId === 'maps') {
+                    setTimeout(() => {
+                        if (map) map.invalidateSize();
+                    }, 300);
                 }
-            } catch (error) {
+                
+                // Load content for tabs that need dynamic data
+                if (tabId === 'nearby') {
+                    loadNearbyDestinations();
+                }
+            });
+        });
+        
+        // Review form
+        document.getElementById('add-review-btn').addEventListener('click', () => {
+            document.getElementById('review-form-container').style.display = 'block';
+        });
+        
+        document.getElementById('cancel-review-btn').addEventListener('click', () => {
+            document.getElementById('review-form-container').style.display = 'none';
+            document.getElementById('review-form').reset();
+        });
+        
+        document.getElementById('review-form').addEventListener('submit', submitReview);
+        
+        // Load more reviews
+        document.getElementById('load-more-reviews').addEventListener('click', loadMoreReviews);
+        
+        // Floating action buttons
+        document.getElementById('location-btn').addEventListener('click', getUserLocation);
+        document.getElementById('direction-btn').addEventListener('click', addRoute);
+        document.getElementById('call-btn').addEventListener('click', () => {
+            const phone = document.getElementById('contact-phone').textContent;
+            window.location.href = `tel:${phone}`;
+        });
+        
+        // Share button
+        document.getElementById('share-btn').addEventListener('click', shareDestination);
+        
+        // Save button
+        document.getElementById('save-btn').addEventListener('click', toggleFavorite);
+        
+        // Directions button
+        document.getElementById('directions-btn').addEventListener('click', addRoute);
+    }
+    
+    // Load destination data from Supabase
+    async function loadDestinationData(destinationId) {
+        try {
+            // Get destination details
+            const { data: destination, error } = await supabase
+                .from('destinations')
+                .select('*')
+                .eq('id', destinationId)
+                .single();
+            
+            if (error) {
+                throw error;
+            }
+            
+            // Populate page with destination data
+            populateDestinationData(destination);
+            
+            // Load destination reviews
+            loadReviews(destinationId);
+            
+            // Load destination visits stats
+            loadVisitStats(destinationId);
+            
+            // Check if destination is in user's favorites
+            checkIfFavorite(destinationId);
+            
+        } catch (error) {
+            console.error('Error loading destination:', error);
+            alert('Terjadi kesalahan saat memuat data destinasi');
+        }
+    }
+    
+    // Populate page with destination data
+    function populateDestinationData(destination) {
+        // Hero section
+        document.getElementById('destination-hero').style.backgroundImage = `url('${destination.image_url}')`;
+        document.getElementById('destination-name').textContent = destination.name;
+        document.getElementById('destination-description').textContent = destination.description;
+        document.getElementById('destination-location').textContent = 'Sidoarjo, Jawa Timur';
+        
+        // Rating
+        updateRatingDisplay(destination.rating, destination.review_count);
+        
+        // Overview tab
+        document.getElementById('overview-title').textContent = `Tentang ${destination.name}`;
+        document.getElementById('overview-description').textContent = destination.description;
+        
+        // Facilities and activities - ambil dari database
+        const facilitiesList = document.getElementById('facilities-list');
+        const activitiesList = document.getElementById('activities-list');
+        const tipsList = document.getElementById('tips-list');
+        
+        // Parse facilities dan activities dari database
+        let facilities = parseDatabaseArray(destination.facilities, [
+            'Area Parkir Luas', 
+            'Spot Foto Instagenik', 
+            'Warung Makan Terdekat', 
+            'Toilet Umum'
+        ]);
+        
+        let activities = parseDatabaseArray(destination.activities, [
+            'Foto & Dokumentasi', 
+            'Edukasi Sejarah', 
+            'Jalan-jalan Santai', 
+            'Wisata Keluarga'
+        ]);
+        
+        const tips = [
+            'Bawa kamera untuk mengabadikan momen di spot-spot foto yang menarik',
+            'Kunjungi pada pagi atau sore hari untuk menghindari panas terik',
+            'Pelajari sejarah destinasi sebelum berkunjung untuk pengalaman yang lebih bermakna',
+            'Gunakan pakaian yang nyaman karena area destinasi cukup terbuka'
+        ];
+        
+        // Tampilkan facilities dengan status aktif/tidak aktif
+        facilities.forEach(facility => {
+            const li = document.createElement('li');
+            li.className = 'flex items-center';
+            
+            if (typeof facility === 'object' && facility.hasOwnProperty('active')) {
+                // Format object: {name: "Area Parkir Luas", active: true}
+                li.innerHTML = `<i class="fas fa-${facility.active ? 'check' : 'times'} ${facility.active ? 'text-green-500' : 'text-red-500'} mr-3"></i><span>${facility.name}</span>`;
+            } else {
+                // Format string atau semua aktif
+                li.innerHTML = `<i class="fas fa-check text-green-500 mr-3"></i><span>${facility}</span>`;
+            }
+            facilitiesList.appendChild(li);
+        });
+        
+        // Tampilkan activities dengan status aktif/tidak aktif
+        activities.forEach(activity => {
+            const li = document.createElement('li');
+            li.className = 'flex items-center';
+            
+            if (typeof activity === 'object' && activity.hasOwnProperty('active')) {
+                // Format object: {name: "Foto & Dokumentasi", active: true}
+                li.innerHTML = `<i class="fas fa-${activity.active ? 'check' : 'times'} ${activity.active ? 'text-green-500' : 'text-red-500'} mr-3"></i><span>${activity.name}</span>`;
+            } else {
+                // Format string atau semua aktif
+                li.innerHTML = `<i class="fas fa-check text-green-500 mr-3"></i><span>${activity}</span>`;
+            }
+            activitiesList.appendChild(li);
+        });
+        
+        tips.forEach(tip => {
+            const li = document.createElement('li');
+            li.textContent = tip;
+            tipsList.appendChild(li);
+        });
+        
+        // Maps tab
+        document.getElementById('destination-address').textContent = destination.address || 'Jl. Raya Porong, Kec. Porong, Kabupaten Sidoarjo, Jawa Timur';
+        
+        // Transportation
+        const transportationList = document.getElementById('transportation-list');
+        const transportOptions = [
+            { icon: 'bus', text: 'Bus: Angkutan Porong - Sidoarjo' },
+            { icon: 'motorcycle', text: 'Ojek Online: Tersedia' },
+            { icon: 'car', text: 'Parkir: Tersedia (Gratis)' }
+        ];
+        
+        transportOptions.forEach(transport => {
+            const li = document.createElement('li');
+            li.className = 'flex items-center';
+            li.innerHTML = `<i class="fas fa-${transport.icon} text-blue-500 mr-3"></i><span>${transport.text}</span>`;
+            transportationList.appendChild(li);
+        });
+        
+        // Gallery tab
+        const galleryContainer = document.getElementById('gallery-container');
+        
+        // Create array of images from database columns
+        const galleryImages = [
+            destination.image_url,
+            destination.image_url_2,
+            destination.image_url_3,
+            destination.image_url_4
+        ].filter(url => url); // Filter out any null/undefined values
+
+        // If no additional images, use the main image as fallback
+        if (galleryImages.length === 0 && destination.image_url) {
+            galleryImages.push(destination.image_url);
+        }
+
+        galleryImages.forEach((imageUrl, index) => {
+            const galleryItem = document.createElement('div');
+            galleryItem.className = 'gallery-item';
+            galleryItem.innerHTML = `<img src="${imageUrl}" alt="${destination.name} - Foto ${index + 1}">`;
+            galleryContainer.appendChild(galleryItem);
+        });
+        
+        // Set up gallery modal
+        setupGalleryModal();
+        
+        // Sidebar information
+        document.getElementById('operating-hours').textContent = destination.operating_hours || '24 Jam';
+        document.getElementById('entry-fee').textContent = destination.entry_fee === 0 ? 'Gratis' : `Rp ${destination.entry_fee.toLocaleString()}`;
+        document.getElementById('visit-duration').textContent = destination.visit_duration || '1-2 Jam';
+        document.getElementById('destination-category').textContent = getCategoryName(destination.category);
+        document.getElementById('contact-phone').textContent = destination.contact_phone || '(031) 8965432';
+        document.getElementById('contact-email').textContent = destination.contact_email || 'info@destinasi.sda';
+        document.getElementById('contact-website').textContent = destination.website || 'www.destinasi.sda.go.id';
+        
+        // Update map with destination coordinates
+        if (destination.latitude && destination.longitude) {
+            updateMap([destination.latitude, destination.longitude]);
+        } else {
+            // Default coordinates for Sidoarjo
+            updateMap([-7.5309, 112.7049]);
+        }
+    }
+    
+    // Helper function to parse database array/JSON
+    function parseDatabaseArray(data, defaultArray) {
+        if (!data) return defaultArray;
+        
+        try {
+            // Jika data adalah array PostgreSQL
+            if (Array.isArray(data)) {
+                return data;
+            }
+            // Jika data adalah JSON string
+            else if (typeof data === 'string') {
+                const parsed = JSON.parse(data);
+                return Array.isArray(parsed) ? parsed : defaultArray;
+            }
+            // Default fallback
+            else {
+                return defaultArray;
+            }
+        } catch (error) {
+            console.error('Error parsing database array:', error);
+            return defaultArray;
+        }
+    }
+    
+    // Update rating display
+    function updateRatingDisplay(rating, reviewCount) {
+        const ratingElement = document.getElementById('destination-rating');
+        const averageRatingElement = document.getElementById('average-rating');
+        const averageRatingStars = document.getElementById('average-rating-stars');
+        const sidebarRating = document.getElementById('sidebar-rating');
+        const reviewsCountElement = document.getElementById('reviews-count');
+        
+        // Format rating to one decimal place
+        const formattedRating = parseFloat(rating).toFixed(1);
+        
+        // Update rating in various places
+        ratingElement.innerHTML = `
+            <div class="flex star-rating">
+                ${generateStars(rating)}
+            </div>
+            <span class="font-semibold">${formattedRating}</span>
+            <span class="text-blue-200">(${reviewCount} ulasan)</span>
+        `;
+        
+        averageRatingElement.textContent = formattedRating;
+        averageRatingStars.innerHTML = generateStars(rating);
+        sidebarRating.textContent = formattedRating;
+        reviewsCountElement.textContent = `Berdasarkan ${reviewCount} ulasan`;
+    }
+    
+    // Generate star HTML based on rating
+    function generateStars(rating) {
+        let stars = '';
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+        
+        for (let i = 0; i < fullStars; i++) {
+            stars += '<i class="fas fa-star"></i>';
+        }
+        
+        if (hasHalfStar) {
+            stars += '<i class="fas fa-star-half-alt"></i>';
+        }
+        
+        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+        for (let i = 0; i < emptyStars; i++) {
+            stars += '<i class="far fa-star"></i>';
+        }
+        
+        return stars;
+    }
+    
+    // Get category name
+    function getCategoryName(category) {
+        const categories = {
+            'wisata-alam': 'Wisata Alam',
+            'wisata-sejarah': 'Wisata Sejarah',
+            'wisata-keluarga': 'Wisata Keluarga'
+        };
+        return categories[category] || category;
+    }
+    
+    // Initialize map
+    function initMap() {
+        // Default coordinates (Sidoarjo)
+        const defaultCoords = [-7.4478, 112.7183];
+        
+        // Initialize map
+        map = L.map('map').setView(defaultCoords, 13);
+        
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Try to get user location
+        getUserLocation();
+    }
+    
+    // Update map with destination coordinates
+    function updateMap(coords) {
+        // Remove existing destination marker
+        if (destinationMarker) {
+            map.removeLayer(destinationMarker);
+        }
+        
+        // Add destination marker
+        destinationMarker = L.marker(coords)
+            .addTo(map)
+            .bindPopup(document.getElementById('destination-name').textContent)
+            .openPopup();
+        
+        // If we have user location, calculate distance
+        if (userMarker) {
+            const userCoords = userMarker.getLatLng();
+            calculateDistance([userCoords.lat, userCoords.lng], coords);
+            
+            // Adjust map view to show both locations
+            const bounds = L.latLngBounds([userCoords, coords]);
+            map.fitBounds(bounds, { padding: [20, 20] });
+        } else {
+            // Just focus on destination
+            map.setView(coords, 15);
+        }
+    }
+    
+    // Get user location
+    function getUserLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const userCoords = [position.coords.latitude, position.coords.longitude];
+                    
+                    // Remove existing user marker
+                    if (userMarker) {
+                        map.removeLayer(userMarker);
+                    }
+                    
+                    // Add user marker
+                    userMarker = L.marker(userCoords, {
+                        icon: L.divIcon({
+                            className: 'user-location-marker',
+                            html: '<div style="background-color: #3b82f6; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>',
+                            iconSize: [20, 20],
+                            iconAnchor: [10, 10]
+                        })
+                    }).addTo(map)
+                    .bindPopup('Lokasi Anda')
+                    .openPopup();
+                    
+                    // Calculate distance if we have destination coordinates
+                    if (destinationMarker) {
+                        const destCoords = destinationMarker.getLatLng();
+                        calculateDistance(userCoords, [destCoords.lat, destCoords.lng]);
+                        
+                        // Adjust map view to show both locations
+                        const bounds = L.latLngBounds([userCoords, [destCoords.lat, destCoords.lng]]);
+                        map.fitBounds(bounds, { padding: [20, 20] });
+                    }
+                },
+                function(error) {
+                    console.error("Error getting location: ", error);
+                    document.getElementById('distance-info').innerHTML = '<i class="fas fa-road"></i><span>Gagal mendapatkan lokasi</span>';
+                }
+            );
+        } else {
+            alert("Geolocation tidak didukung oleh browser ini.");
+        }
+    }
+    
+    // Calculate distance between two coordinates
+    function calculateDistance(coord1, coord2) {
+        // Using Haversine formula to calculate distance
+        const R = 6371; // Earth radius in km
+        const dLat = (coord2[0] - coord1[0]) * Math.PI / 180;
+        const dLon = (coord2[1] - coord1[1]) * Math.PI / 180;
+        const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(coord1[0] * Math.PI / 180) * Math.cos(coord2[0] * Math.PI / 180) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const distance = R * c;
+        
+        // Display distance
+        document.getElementById('distance-info').innerHTML = 
+            `<i class="fas fa-road"></i><span>${distance.toFixed(1)} km dari lokasi Anda</span>`;
+    }
+    
+    // Add route from user location to destination
+    function addRoute() {
+        if (!userMarker) {
+            alert("Silakan aktifkan izin lokasi terlebih dahulu");
+            getUserLocation();
+            return;
+        }
+        
+        const userCoords = userMarker.getLatLng();
+        const destinationCoords = destinationMarker.getLatLng();
+        
+        // Open directions in Google Maps
+        const url = `https://www.google.com/maps/dir/?api=1&origin=${userCoords.lat},${userCoords.lng}&destination=${destinationCoords.lat},${destinationCoords.lng}&travelmode=driving`;
+        window.open(url, '_blank');
+    }
+    
+    // Set up gallery modal
+    function setupGalleryModal() {
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        const modal = document.getElementById('image-modal');
+        const modalImage = document.getElementById('modal-image');
+        const modalClose = document.querySelector('.modal-close');
+        
+        galleryItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const imgSrc = item.querySelector('img').getAttribute('src');
+                modalImage.setAttribute('src', imgSrc);
+                modal.style.display = 'flex';
+            });
+        });
+        
+        modalClose.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    }
+    
+    // Load reviews from Supabase
+    async function loadReviews(destinationId, offset = 0) {
+        try {
+            const { data: reviews, error } = await supabase
+                .from('reviews')
+                .select(`
+                    *,
+                    users (
+                        name,
+                        avatar_url
+                    )
+                `)
+                .eq('destination_id', destinationId)
+                .order('created_at', { ascending: false })
+                .range(offset, offset + REVIEWS_PER_PAGE - 1);
+            
+            if (error) {
+                throw error;
+            }
+            
+            if (offset === 0) {
+                currentReviews = reviews;
+            } else {
+                currentReviews = [...currentReviews, ...reviews];
+            }
+            
+            displayReviews(currentReviews);
+            
+            // Hide load more button if we have less than REVIEWS_PER_PAGE reviews
+            if (reviews.length < REVIEWS_PER_PAGE) {
+                document.getElementById('load-more-reviews').style.display = 'none';
+            } else {
+                document.getElementById('load-more-reviews').style.display = 'block';
+            }
+            
+        } catch (error) {
+            console.error('Error loading reviews:', error);
+        }
+    }
+    
+    // Load more reviews
+    function loadMoreReviews() {
+        reviewsOffset += REVIEWS_PER_PAGE;
+        loadReviews(currentDestinationId, reviewsOffset);
+    }
+    
+    // Display reviews
+    function displayReviews(reviews) {
+        const container = document.getElementById('reviews-container');
+        
+        if (reviews.length === 0) {
+            container.innerHTML = '<p class="text-center text-gray-500 py-4">Belum ada ulasan untuk destinasi ini.</p>';
+            return;
+        }
+        
+        // Clear container if we're loading the first page
+        if (reviewsOffset === 0) {
+            container.innerHTML = '';
+        }
+        
+        reviews.forEach(review => {
+            const reviewCard = document.createElement('div');
+            reviewCard.className = 'review-card bg-white p-4 rounded-xl border-l-4 border-blue-500';
+            
+            const reviewDate = new Date(review.created_at).toLocaleDateString('id-ID', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            reviewCard.innerHTML = `
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <h4 class="font-bold">${review.users.name}</h4>
+                        <div class="flex items-center mt-1">
+                            <div class="flex star-rating mr-2">
+                                ${generateStars(review.rating)}
+                            </div>
+                            <span class="text-sm text-gray-500">${reviewDate}</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-gray-700">${review.comment}</p>
+            `;
+            
+            container.appendChild(reviewCard);
+        });
+    }
+    
+    // Submit review
+    async function submitReview(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const rating = parseInt(formData.get('rating'));
+        const comment = formData.get('comment');
+        
+        if (!rating) {
+            alert('Silakan beri rating terlebih dahulu');
+            return;
+        }
+        
+        if (!comment.trim()) {
+            alert('Silakan tulis komentar terlebih dahulu');
+            return;
+        }
+        
+        try {
+            // In a real app, you would have user authentication
+            // For demo purposes, we'll use a placeholder user ID
+            const userId = 1; // This should come from your auth system
+            
+            const { data, error } = await supabase
+                .from('reviews')
+                .insert([
+                    {
+                        destination_id: currentDestinationId,
+                        user_id: userId,
+                        rating: rating,
+                        comment: comment
+                    }
+                ]);
+            
+            if (error) {
+                throw error;
+            }
+            
+            // Hide form and reset
+            document.getElementById('review-form-container').style.display = 'none';
+            document.getElementById('review-form').reset();
+            
+            // Reload reviews and destination data to update rating
+            loadReviews(currentDestinationId);
+            loadDestinationData(currentDestinationId);
+            
+            alert('Ulasan berhasil dikirim!');
+            
+        } catch (error) {
+            console.error('Error submitting review:', error);
+            alert('Terjadi kesalahan saat mengirim ulasan');
+        }
+    }
+    
+    // Load nearby destinations
+    async function loadNearbyDestinations() {
+        try {
+            const { data: destinations, error } = await supabase
+                .from('destinations')
+                .select('*')
+                .neq('id', currentDestinationId)
+                .limit(4);
+            
+            if (error) {
+                throw error;
+            }
+            
+            displayNearbyDestinations(destinations || []);
+            
+        } catch (error) {
+            console.error('Error loading nearby destinations:', error);
+        }
+    }
+    
+    // Display nearby destinations
+    function displayNearbyDestinations(destinations) {
+        const container = document.getElementById('nearby-container');
+        container.innerHTML = '';
+        
+        if (destinations.length === 0) {
+            container.innerHTML = '<p class="text-center text-gray-500 col-span-2">Tidak ada destinasi terdekat lainnya.</p>';
+            return;
+        }
+        
+        destinations.forEach(destination => {
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-xl overflow-hidden shadow-sm card-hover';
+            
+            card.innerHTML = `
+                <div class="h-40 bg-cover bg-center" style="background-image: url('${destination.image_url}')"></div>
+                <div class="p-4">
+                    <h3 class="font-bold text-lg mb-2">${destination.name}</h3>
+                    <p class="text-gray-600 text-sm mb-3">${destination.description.substring(0, 100)}...</p>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <div class="flex star-rating text-sm mr-2">
+                                ${generateStars(destination.rating)}
+                            </div>
+                            <span class="text-sm font-semibold">${parseFloat(destination.rating).toFixed(1)}</span>
+                        </div>
+                        <a href="detail_wisata.html?id=${destination.id}" class="text-sm text-blue-500 font-semibold hover:text-blue-700">
+                            Lihat Detail
+                        </a>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(card);
+        });
+    }
+    
+    // Track page view
+    async function trackPageView(destinationId) {
+        try {
+            const { data, error } = await supabase
+                .from('page_views')
+                .insert([
+                    {
+                        destination_id: destinationId,
+                        user_agent: navigator.userAgent,
+                        ip_address: '' // In a real app, you would get this from your backend
+                    }
+                ]);
+            
+            if (error) {
                 console.error('Error tracking page view:', error);
             }
+        } catch (error) {
+            console.error('Error tracking page view:', error);
         }
-        
-        // Load visit stats
-        async function loadVisitStats(destinationId) {
-            try {
-                // Get total visits
-                const { count: totalVisits, error: totalError } = await supabase
-                    .from('page_views')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('destination_id', destinationId);
-                
-                if (!totalError) {
-                    document.getElementById('total-visits').textContent = totalVisits || 0;
-                }
-                
-                // Get monthly visits (current month)
-                const now = new Date();
-                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-                const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-                
-                const { count: monthlyVisits, error: monthlyError } = await supabase
-                    .from('page_views')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('destination_id', destinationId)
-                    .gte('created_at', startOfMonth.toISOString())
-                    .lte('created_at', endOfMonth.toISOString());
-                
-                if (!monthlyError) {
-                    document.getElementById('monthly-visits').textContent = monthlyVisits || 0;
-                }
-                
-            } catch (error) {
-                console.error('Error loading visit stats:', error);
+    }
+    
+    // Load visit stats
+    async function loadVisitStats(destinationId) {
+        try {
+            // Get total visits
+            const { count: totalVisits, error: totalError } = await supabase
+                .from('page_views')
+                .select('*', { count: 'exact', head: true })
+                .eq('destination_id', destinationId);
+            
+            if (!totalError) {
+                document.getElementById('total-visits').textContent = totalVisits || 0;
             }
-        }
-        
-        // Check if destination is in user's favorites
-        async function checkIfFavorite(destinationId) {
-            try {
-                // In a real app, you would check against the user's favorites
-                // For demo purposes, we'll check localStorage
-                const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-                const isFavorite = favorites.includes(destinationId);
-                
-                const saveBtn = document.getElementById('save-btn');
-                if (isFavorite) {
-                    saveBtn.innerHTML = '<i class="fas fa-bookmark"></i><span>Disimpan</span>';
-                } else {
-                    saveBtn.innerHTML = '<i class="far fa-bookmark"></i><span>Simpan</span>';
-                }
-                
-            } catch (error) {
-                console.error('Error checking favorite status:', error);
+            
+            // Get monthly visits (current month)
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            
+            const { count: monthlyVisits, error: monthlyError } = await supabase
+                .from('page_views')
+                .select('*', { count: 'exact', head: true })
+                .eq('destination_id', destinationId)
+                .gte('created_at', startOfMonth.toISOString())
+                .lte('created_at', endOfMonth.toISOString());
+            
+            if (!monthlyError) {
+                document.getElementById('monthly-visits').textContent = monthlyVisits || 0;
             }
+            
+        } catch (error) {
+            console.error('Error loading visit stats:', error);
         }
-        
-        // Toggle favorite status
-        async function toggleFavorite() {
-            try {
-                // In a real app, you would update the database
-                // For demo purposes, we'll use localStorage
-                const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-                const isFavorite = favorites.includes(currentDestinationId);
-                
-                const saveBtn = document.getElementById('save-btn');
-                
-                if (isFavorite) {
-                    // Remove from favorites
-                    const index = favorites.indexOf(currentDestinationId);
-                    favorites.splice(index, 1);
-                    saveBtn.innerHTML = '<i class="far fa-bookmark"></i><span>Simpan</span>';
-                } else {
-                    // Add to favorites
-                    favorites.push(currentDestinationId);
-                    saveBtn.innerHTML = '<i class="fas fa-bookmark"></i><span>Disimpan</span>';
-                }
-                
-                localStorage.setItem('favorites', JSON.stringify(favorites));
-                
-            } catch (error) {
-                console.error('Error toggling favorite:', error);
-            }
-        }
-        
-        // Share destination
-        function shareDestination() {
-            if (navigator.share) {
-                navigator.share({
-                    title: document.getElementById('destination-name').textContent,
-                    text: document.getElementById('destination-description').textContent,
-                    url: window.location.href
-                })
-                .then(() => console.log('Berhasil dibagikan'))
-                .catch(error => console.log('Error sharing:', error));
+    }
+    
+    // Check if destination is in user's favorites
+    async function checkIfFavorite(destinationId) {
+        try {
+            // In a real app, you would check against the user's favorites
+            // For demo purposes, we'll check localStorage
+            const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            const isFavorite = favorites.includes(destinationId);
+            
+            const saveBtn = document.getElementById('save-btn');
+            if (isFavorite) {
+                saveBtn.innerHTML = '<i class="fas fa-bookmark"></i><span>Disimpan</span>';
             } else {
-                // Fallback for browsers that don't support Web Share API
-                navigator.clipboard.writeText(window.location.href)
-                    .then(() => alert('Link berhasil disalin ke clipboard!'))
-                    .catch(err => console.error('Gagal menyalin link: ', err));
+                saveBtn.innerHTML = '<i class="far fa-bookmark"></i><span>Simpan</span>';
             }
+            
+        } catch (error) {
+            console.error('Error checking favorite status:', error);
         }
-    </script>
+    }
+    
+    // Toggle favorite status
+    async function toggleFavorite() {
+        try {
+            // In a real app, you would update the database
+            // For demo purposes, we'll use localStorage
+            const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            const isFavorite = favorites.includes(currentDestinationId);
+            
+            const saveBtn = document.getElementById('save-btn');
+            
+            if (isFavorite) {
+                // Remove from favorites
+                const index = favorites.indexOf(currentDestinationId);
+                favorites.splice(index, 1);
+                saveBtn.innerHTML = '<i class="far fa-bookmark"></i><span>Simpan</span>';
+            } else {
+                // Add to favorites
+                favorites.push(currentDestinationId);
+                saveBtn.innerHTML = '<i class="fas fa-bookmark"></i><span>Disimpan</span>';
+            }
+            
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+        }
+    }
+    
+    // Share destination
+    function shareDestination() {
+        if (navigator.share) {
+            navigator.share({
+                title: document.getElementById('destination-name').textContent,
+                text: document.getElementById('destination-description').textContent,
+                url: window.location.href
+            })
+            .then(() => console.log('Berhasil dibagikan'))
+            .catch(error => console.log('Error sharing:', error));
+        } else {
+            // Fallback for browsers that don't support Web Share API
+            navigator.clipboard.writeText(window.location.href)
+                .then(() => alert('Link berhasil disalin ke clipboard!'))
+                .catch(err => console.error('Gagal menyalin link: ', err));
+        }
+    }
+</script>
 </body>
 </html>
