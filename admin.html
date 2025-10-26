@@ -229,6 +229,31 @@
             background-color: #3b82f6;
             border-color: #3b82f6;
         }
+
+        .url-help {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .coords-status {
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .coords-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .coords-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -597,6 +622,105 @@
             setupEventListeners();
         });
 
+        // Function to extract lat/lng from Google Maps URL
+        function parseGoogleMapsUrl(url) {
+            if (!url) return null;
+            
+            try {
+                // Format 1: https://maps.google.com/?q=lat,lng
+                const qParamMatch = url.match(/[?&]q=([-+]?\d+\.\d+),([-+]?\d+\.\d+)/);
+                if (qParamMatch) {
+                    return {
+                        latitude: parseFloat(qParamMatch[1]),
+                        longitude: parseFloat(qParamMatch[2])
+                    };
+                }
+                
+                // Format 2: https://www.google.com/maps/place/@lat,lng
+                const placeMatch = url.match(/@([-+]?\d+\.\d+),([-+]?\d+\.\d+)/);
+                if (placeMatch) {
+                    return {
+                        latitude: parseFloat(placeMatch[1]),
+                        longitude: parseFloat(placeMatch[2])
+                    };
+                }
+                
+                // Format 3: https://www.google.com/maps?ll=lat,lng
+                const llParamMatch = url.match(/[?&]ll=([-+]?\d+\.\d+),([-+]?\d+\.\d+)/);
+                if (llParamMatch) {
+                    return {
+                        latitude: parseFloat(llParamMatch[1]),
+                        longitude: parseFloat(llParamMatch[2])
+                    };
+                }
+                
+                // Format 4: https://maps.app.goo.gl/... (gunakan fallback)
+                if (url.includes('goo.gl') || url.includes('maps.app')) {
+                    return 'short_url';
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('Error parsing Google Maps URL:', error);
+                return null;
+            }
+        }
+
+        // Function to setup Google Maps URL auto-fill
+        function setupGoogleMapsAutoFill() {
+            const mapsUrlInput = document.getElementById('maps_url');
+            const latitudeInput = document.getElementById('latitude');
+            const longitudeInput = document.getElementById('longitude');
+            const coordsStatus = document.getElementById('coords-status');
+            
+            if (mapsUrlInput && latitudeInput && longitudeInput) {
+                // Remove existing status if any
+                if (coordsStatus) {
+                    coordsStatus.remove();
+                }
+                
+                mapsUrlInput.addEventListener('blur', function() {
+                    const url = this.value.trim();
+                    
+                    // Remove existing status
+                    const existingStatus = document.getElementById('coords-status');
+                    if (existingStatus) {
+                        existingStatus.remove();
+                    }
+                    
+                    if (url) {
+                        const coords = parseGoogleMapsUrl(url);
+                        
+                        if (coords === 'short_url') {
+                            // Untuk link pendek
+                            const statusDiv = document.createElement('div');
+                            statusDiv.id = 'coords-status';
+                            statusDiv.className = 'coords-status coords-warning';
+                            statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Link Google Maps pendek terdeteksi. Silakan masukkan latitude dan longitude manual atau gunakan link lengkap.';
+                            mapsUrlInput.parentNode.appendChild(statusDiv);
+                        } else if (coords) {
+                            // Berhasil extract coordinates
+                            latitudeInput.value = coords.latitude;
+                            longitudeInput.value = coords.longitude;
+                            
+                            const statusDiv = document.createElement('div');
+                            statusDiv.id = 'coords-status';
+                            statusDiv.className = 'coords-status coords-success';
+                            statusDiv.innerHTML = `<i class="fas fa-check-circle mr-2"></i>Koordinat berhasil diambil: ${coords.latitude}, ${coords.longitude}`;
+                            mapsUrlInput.parentNode.appendChild(statusDiv);
+                        } else {
+                            // Tidak bisa parse URL
+                            const statusDiv = document.createElement('div');
+                            statusDiv.id = 'coords-status';
+                            statusDiv.className = 'coords-status coords-warning';
+                            statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Format URL tidak dikenali. Silakan masukkan latitude dan longitude manual.';
+                            mapsUrlInput.parentNode.appendChild(statusDiv);
+                        }
+                    }
+                });
+            }
+        }
+
         // Set up event listeners
         function setupEventListeners() {
             // Sidebar toggle for mobile
@@ -859,7 +983,7 @@
                     <div class="flex-1">
                         <div class="font-medium">${review.users?.name || 'Pengguna'}</div>
                         <div class="text-sm text-gray-500">${review.destinations?.name || 'Destinasi'}</div>
-                        <div class="text-yellow-500 text-sm">${stars}</div>
+                        <div class="<b>text-yellow-500 text-sm</b>">${stars}</div>
                     </div>
                     <div class="text-sm text-gray-500">${formatDate(review.created_at)}</div>
                 `;
@@ -1202,18 +1326,51 @@
                             <input type="number" id="review_count" name="review_count" min="0" class="form-input" value="0" required>
                         </div>
                     </div>
+                    <!-- TAMBAHAN FIELD BARU -->
+                    <div class="form-group">
+                        <label class="form-label" for="operating_hours">Jam Operasional</label>
+                        <input type="text" id="operating_hours" name="operating_hours" class="form-input" placeholder="08:00 - 17:00 atau 24 Jam">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="entry_fee">Biaya Masuk (Rp)</label>
+                        <input type="number" id="entry_fee" name="entry_fee" min="0" class="form-input" placeholder="10000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="visit_duration">Durasi Kunjungan</label>
+                        <input type="text" id="visit_duration" name="visit_duration" class="form-input" placeholder="1-2 Jam">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="contact_phone">Nomor Telepon</label>
+                        <input type="text" id="contact_phone" name="contact_phone" class="form-input" placeholder="+62 812-3456-7890">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="contact_email">Email</label>
+                        <input type="email" id="contact_email" name="contact_email" class="form-input" placeholder="info@destinasi.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="website">Website</label>
+                        <input type="url" id="website" name="website" class="form-input" placeholder="https://www.destinasi.com">
+                    </div>
+                    <!-- AKHIR TAMBAHAN FIELD BARU -->
                     <div class="form-group">
                         <label class="form-label" for="address">Alamat</label>
                         <input type="text" id="address" name="address" class="form-input">
                     </div>
+                    <div class="form-group">
+                        <label class="form-label" for="maps_url">URL Google Maps</label>
+                        <input type="url" id="maps_url" name="maps_url" class="form-input" placeholder="https://maps.google.com/?q=-7.12345,112.12345">
+                        <div class="url-help">
+                            Tempelkan URL Google Maps untuk mengisi latitude dan longitude otomatis
+                        </div>
+                    </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="form-group">
                             <label class="form-label" for="latitude">Latitude</label>
-                            <input type="number" id="latitude" name="latitude" step="any" class="form-input">
+                            <input type="number" id="latitude" name="latitude" step="any" class="form-input" placeholder="-7.12345">
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="longitude">Longitude</label>
-                            <input type="number" id="longitude" name="longitude" step="any" class="form-input">
+                            <input type="number" id="longitude" name="longitude" step="any" class="form-input" placeholder="112.12345">
                         </div>
                     </div>
                 `;
@@ -1276,6 +1433,7 @@
             // Add image preview functionality for destination images
             if (type === 'destination') {
                 setupImagePreviews();
+                setupGoogleMapsAutoFill();
             }
         }
 
@@ -1476,18 +1634,51 @@
                                 <input type="number" id="review_count" name="review_count" min="0" value="${item.review_count}" class="form-input" required>
                             </div>
                         </div>
+                        <!-- TAMBAHAN FIELD BARU -->
+                        <div class="form-group">
+                            <label class="form-label" for="operating_hours">Jam Operasional</label>
+                            <input type="text" id="operating_hours" name="operating_hours" value="${item.operating_hours || ''}" class="form-input" placeholder="08:00 - 17:00 atau 24 Jam">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="entry_fee">Biaya Masuk (Rp)</label>
+                            <input type="number" id="entry_fee" name="entry_fee" min="0" value="${item.entry_fee || ''}" class="form-input" placeholder="10000">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="visit_duration">Durasi Kunjungan</label>
+                            <input type="text" id="visit_duration" name="visit_duration" value="${item.visit_duration || ''}" class="form-input" placeholder="1-2 Jam">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="contact_phone">Nomor Telepon</label>
+                            <input type="text" id="contact_phone" name="contact_phone" value="${item.contact_phone || ''}" class="form-input" placeholder="+62 812-3456-7890">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="contact_email">Email</label>
+                            <input type="email" id="contact_email" name="contact_email" value="${item.contact_email || ''}" class="form-input" placeholder="info@destinasi.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="website">Website</label>
+                            <input type="url" id="website" name="website" value="${item.website || ''}" class="form-input" placeholder="https://www.destinasi.com">
+                        </div>
+                        <!-- AKHIR TAMBAHAN FIELD BARU -->
                         <div class="form-group">
                             <label class="form-label" for="address">Alamat</label>
                             <input type="text" id="address" name="address" value="${item.address || ''}" class="form-input">
                         </div>
+                        <div class="form-group">
+                            <label class="form-label" for="maps_url">URL Google Maps</label>
+                            <input type="url" id="maps_url" name="maps_url" class="form-input" placeholder="https://maps.google.com/?q=-7.12345,112.12345">
+                            <div class="url-help">
+                                Tempelkan URL Google Maps untuk mengisi latitude dan longitude otomatis
+                            </div>
+                        </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="form-group">
                                 <label class="form-label" for="latitude">Latitude</label>
-                                <input type="number" id="latitude" name="latitude" step="any" value="${item.latitude || ''}" class="form-input">
+                                <input type="number" id="latitude" name="latitude" step="any" value="${item.latitude || ''}" class="form-input" placeholder="-7.12345">
                             </div>
                             <div class="form-group">
                                 <label class="form-label" for="longitude">Longitude</label>
-                                <input type="number" id="longitude" name="longitude" step="any" value="${item.longitude || ''}" class="form-input">
+                                <input type="number" id="longitude" name="longitude" step="any" value="${item.longitude || ''}" class="form-input" placeholder="112.12345">
                             </div>
                         </div>
                     `;
@@ -1554,6 +1745,7 @@
                 // Add image preview functionality for destination images
                 if (type === 'destination') {
                     setupImagePreviews();
+                    setupGoogleMapsAutoFill();
                 }
                 
             } catch (error) {
@@ -1578,6 +1770,7 @@
             if (data.rating) data.rating = parseFloat(data.rating);
             if (data.review_count) data.review_count = parseInt(data.review_count);
             if (data.price) data.price = parseInt(data.price);
+            if (data.entry_fee) data.entry_fee = parseInt(data.entry_fee);
             if (data.latitude) data.latitude = parseFloat(data.latitude);
             if (data.longitude) data.longitude = parseFloat(data.longitude);
             
@@ -1593,6 +1786,14 @@
                 if (data.image_url_2 === '') delete data.image_url_2;
                 if (data.image_url_3 === '') delete data.image_url_3;
                 if (data.image_url_4 === '') delete data.image_url_4;
+                
+                // Clean up empty contact fields
+                if (data.operating_hours === '') delete data.operating_hours;
+                if (data.entry_fee === '' || data.entry_fee === 0) delete data.entry_fee;
+                if (data.visit_duration === '') delete data.visit_duration;
+                if (data.contact_phone === '') delete data.contact_phone;
+                if (data.contact_email === '') delete data.contact_email;
+                if (data.website === '') delete data.website;
             }
             
             try {
@@ -1634,6 +1835,7 @@
                 }
                 
                 if (result.error) {
+                    console.error('Supabase error:', result.error);
                     throw result.error;
                 }
                 
@@ -1655,7 +1857,7 @@
                 
             } catch (error) {
                 console.error('Error saving item:', error);
-                alert('Terjadi kesalahan saat menyimpan data');
+                alert('Terjadi kesalahan saat menyimpan data: ' + error.message);
             }
         }
 
