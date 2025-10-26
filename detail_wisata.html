@@ -829,46 +829,51 @@
         document.getElementById('overview-description').textContent = destination.description;
         
         // Facilities and activities - ambil dari database
-        const facilitiesList = document.getElementById('facilities-list');
-        const activitiesList = document.getElementById('activities-list');
-        const tipsList = document.getElementById('tips-list');
-        
-        // Parse facilities dan activities dari database
-        let facilities = parseDatabaseArray(destination.facilities, [
-            'Area Parkir Luas', 
-            'Spot Foto Instagenik', 
-            'Warung Makan Terdekat', 
-            'Toilet Umum'
-        ]);
-        
-        let activities = parseDatabaseArray(destination.activities, [
-            'Foto & Dokumentasi', 
-            'Edukasi Sejarah', 
-            'Jalan-jalan Santai', 
-            'Wisata Keluarga'
-        ]);
-        
-        const tips = [
-            'Bawa kamera untuk mengabadikan momen di spot-spot foto yang menarik',
-            'Kunjungi pada pagi atau sore hari untuk menghindari panas terik',
-            'Pelajari sejarah destinasi sebelum berkunjung untuk pengalaman yang lebih bermakna',
-            'Gunakan pakaian yang nyaman karena area destinasi cukup terbuka'
-        ];
-        
-        // Tampilkan facilities dengan status aktif/tidak aktif
-        facilities.forEach(facility => {
-            const li = document.createElement('li');
-            li.className = 'flex items-center';
-            
-            if (typeof facility === 'object' && facility.hasOwnProperty('active')) {
-                // Format object: {name: "Area Parkir Luas", active: true}
-                li.innerHTML = `<i class="fas fa-${facility.active ? 'check' : 'times'} ${facility.active ? 'text-green-500' : 'text-red-500'} mr-3"></i><span>${facility.name}</span>`;
-            } else {
-                // Format string atau semua aktif
-                li.innerHTML = `<i class="fas fa-check text-green-500 mr-3"></i><span>${facility}</span>`;
-            }
-            facilitiesList.appendChild(li);
-        });
+       // Facilities and activities - ambil dari database
+const facilitiesList = document.getElementById('facilities-list');
+const activitiesList = document.getElementById('activities-list');
+const tipsList = document.getElementById('tips-list');
+
+// Data default untuk semua fasilitas dan aktivitas
+const ALL_FACILITIES = [
+    'Area Parkir Luas',
+    'Spot Foto Instagenik', 
+    'Warung Makan Terdekat',
+    'Toilet Umum'
+];
+
+const ALL_ACTIVITIES = [
+    'Foto & Dokumentasi',
+    'Edukasi Sejarah',
+    'Jalan-jalan Santai',
+    'Wisata Keluarga'
+];
+
+// Parse facilities dan activities dari database
+let activeFacilities = parseDatabaseArray(destination.facilities, ALL_FACILITIES);
+let activeActivities = parseDatabaseArray(destination.activities, ALL_ACTIVITIES);
+
+// Tampilkan SEMUA fasilitas dengan status aktif/tidak aktif
+ALL_FACILITIES.forEach(facility => {
+    const li = document.createElement('li');
+    li.className = 'flex items-center';
+    
+    const isActive = activeFacilities.includes(facility);
+    li.innerHTML = `<i class="fas fa-${isActive ? 'check' : 'times'} ${isActive ? 'text-green-500' : 'text-red-500'} mr-3"></i><span>${facility}</span>`;
+    
+    facilitiesList.appendChild(li);
+});
+
+// Tampilkan SEMUA aktivitas dengan status aktif/tidak aktif
+ALL_ACTIVITIES.forEach(activity => {
+    const li = document.createElement('li');
+    li.className = 'flex items-center';
+    
+    const isActive = activeActivities.includes(activity);
+    li.innerHTML = `<i class="fas fa-${isActive ? 'check' : 'times'} ${isActive ? 'text-green-500' : 'text-red-500'} mr-3"></i><span>${activity}</span>`;
+    
+    activitiesList.appendChild(li);
+});
         
         // Tampilkan activities dengan status aktif/tidak aktif
         activities.forEach(activity => {
@@ -954,28 +959,29 @@
     }
     
     // Helper function to parse database array/JSON
-    function parseDatabaseArray(data, defaultArray) {
-        if (!data) return defaultArray;
-        
-        try {
-            // Jika data adalah array PostgreSQL
-            if (Array.isArray(data)) {
-                return data;
-            }
-            // Jika data adalah JSON string
-            else if (typeof data === 'string') {
-                const parsed = JSON.parse(data);
-                return Array.isArray(parsed) ? parsed : defaultArray;
-            }
-            // Default fallback
-            else {
-                return defaultArray;
-            }
-        } catch (error) {
-            console.error('Error parsing database array:', error);
+    // Helper function to parse database array/JSON
+function parseDatabaseArray(data, defaultArray) {
+    if (!data) return defaultArray;
+    
+    try {
+        // Jika data adalah array PostgreSQL
+        if (Array.isArray(data)) {
+            return data;
+        }
+        // Jika data adalah JSON string
+        else if (typeof data === 'string') {
+            const parsed = JSON.parse(data);
+            return Array.isArray(parsed) ? parsed : defaultArray;
+        }
+        // Default fallback
+        else {
             return defaultArray;
         }
+    } catch (error) {
+        console.error('Error parsing database array:', error);
+        return defaultArray;
     }
+}
     
     // Update rating display
     function updateRatingDisplay(rating, reviewCount) {
