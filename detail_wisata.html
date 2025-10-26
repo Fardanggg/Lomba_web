@@ -691,6 +691,21 @@
     let reviewsOffset = 0;
     const REVIEWS_PER_PAGE = 5;
     
+    // Data lengkap untuk semua fasilitas dan aktivitas
+    const ALL_FACILITIES = [
+        'Area Parkir Luas',
+        'Spot Foto Instagenik', 
+        'Warung Makan Terdekat',
+        'Toilet Umum'
+    ];
+    
+    const ALL_ACTIVITIES = [
+        'Foto & Dokumentasi',
+        'Edukasi Sejarah',
+        'Jalan-jalan Santai',
+        'Wisata Keluarga'
+    ];
+    
     // Initialize the page
     document.addEventListener('DOMContentLoaded', function() {
         // Get destination ID from URL parameters
@@ -809,6 +824,7 @@
             
         } catch (error) {
             console.error('Error loading destination:', error);
+            alert('Terjadi kesalahan saat memuat data destinasi');
         }
     }
     
@@ -828,64 +844,44 @@
         document.getElementById('overview-description').textContent = destination.description;
         
         // Facilities and activities - ambil dari database
-       // Facilities and activities - ambil dari database
-const facilitiesList = document.getElementById('facilities-list');
-const activitiesList = document.getElementById('activities-list');
-const tipsList = document.getElementById('tips-list');
-
-// Data default untuk semua fasilitas dan aktivitas
-const ALL_FACILITIES = [
-    'Area Parkir Luas',
-    'Spot Foto Instagenik', 
-    'Warung Makan Terdekat',
-    'Toilet Umum'
-];
-
-const ALL_ACTIVITIES = [
-    'Foto & Dokumentasi',
-    'Edukasi Sejarah',
-    'Jalan-jalan Santai',
-    'Wisata Keluarga'
-];
-
-// Parse facilities dan activities dari database
-let activeFacilities = parseDatabaseArray(destination.facilities, ALL_FACILITIES);
-let activeActivities = parseDatabaseArray(destination.activities, ALL_ACTIVITIES);
-
-// Tampilkan SEMUA fasilitas dengan status aktif/tidak aktif
-ALL_FACILITIES.forEach(facility => {
-    const li = document.createElement('li');
-    li.className = 'flex items-center';
-    
-    const isActive = activeFacilities.includes(facility);
-    li.innerHTML = `<i class="fas fa-${isActive ? 'check' : 'times'} ${isActive ? 'text-green-500' : 'text-red-500'} mr-3"></i><span>${facility}</span>`;
-    
-    facilitiesList.appendChild(li);
-});
-
-// Tampilkan SEMUA aktivitas dengan status aktif/tidak aktif
-ALL_ACTIVITIES.forEach(activity => {
-    const li = document.createElement('li');
-    li.className = 'flex items-center';
-    
-    const isActive = activeActivities.includes(activity);
-    li.innerHTML = `<i class="fas fa-${isActive ? 'check' : 'times'} ${isActive ? 'text-green-500' : 'text-red-500'} mr-3"></i><span>${activity}</span>`;
-    
-    activitiesList.appendChild(li);
-});
+        const facilitiesList = document.getElementById('facilities-list');
+        const activitiesList = document.getElementById('activities-list');
+        const tipsList = document.getElementById('tips-list');
         
-        // Tampilkan activities dengan status aktif/tidak aktif
-        activities.forEach(activity => {
+        // Parse facilities dan activities dari database
+        let activeFacilities = parseDatabaseArray(destination.facilities, ALL_FACILITIES);
+        let activeActivities = parseDatabaseArray(destination.activities, ALL_ACTIVITIES);
+        
+        const tips = [
+            'Bawa kamera untuk mengabadikan momen di spot-spot foto yang menarik',
+            'Kunjungi pada pagi atau sore hari untuk menghindari panas terik',
+            'Pelajari sejarah destinasi sebelum berkunjung untuk pengalaman yang lebih bermakna',
+            'Gunakan pakaian yang nyaman karena area destinasi cukup terbuka'
+        ];
+        
+        // Kosongkan list sebelum menambahkan item baru
+        facilitiesList.innerHTML = '';
+        activitiesList.innerHTML = '';
+        
+        // Tampilkan SEMUA fasilitas dengan status aktif/tidak aktif
+        ALL_FACILITIES.forEach(facility => {
             const li = document.createElement('li');
             li.className = 'flex items-center';
             
-            if (typeof activity === 'object' && activity.hasOwnProperty('active')) {
-                // Format object: {name: "Foto & Dokumentasi", active: true}
-                li.innerHTML = `<i class="fas fa-${activity.active ? 'check' : 'times'} ${activity.active ? 'text-green-500' : 'text-red-500'} mr-3"></i><span>${activity.name}</span>`;
-            } else {
-                // Format string atau semua aktif
-                li.innerHTML = `<i class="fas fa-check text-green-500 mr-3"></i><span>${activity}</span>`;
-            }
+            const isActive = activeFacilities.includes(facility);
+            li.innerHTML = `<i class="fas fa-${isActive ? 'check' : 'times'} ${isActive ? 'text-green-500' : 'text-red-500'} mr-3"></i><span>${facility}</span>`;
+            
+            facilitiesList.appendChild(li);
+        });
+        
+        // Tampilkan SEMUA aktivitas dengan status aktif/tidak aktif
+        ALL_ACTIVITIES.forEach(activity => {
+            const li = document.createElement('li');
+            li.className = 'flex items-center';
+            
+            const isActive = activeActivities.includes(activity);
+            li.innerHTML = `<i class="fas fa-${isActive ? 'check' : 'times'} ${isActive ? 'text-green-500' : 'text-red-500'} mr-3"></i><span>${activity}</span>`;
+            
             activitiesList.appendChild(li);
         });
         
@@ -958,29 +954,33 @@ ALL_ACTIVITIES.forEach(activity => {
     }
     
     // Helper function to parse database array/JSON
-    // Helper function to parse database array/JSON
-function parseDatabaseArray(data, defaultArray) {
-    if (!data) return defaultArray;
-    
-    try {
-        // Jika data adalah array PostgreSQL
-        if (Array.isArray(data)) {
-            return data;
+    function parseDatabaseArray(data, allItems) {
+        if (!data) return allItems;
+        
+        try {
+            let activeItems = [];
+            
+            // Jika data adalah array PostgreSQL
+            if (Array.isArray(data)) {
+                activeItems = data;
+            }
+            // Jika data adalah JSON string
+            else if (typeof data === 'string') {
+                const parsed = JSON.parse(data);
+                activeItems = Array.isArray(parsed) ? parsed : allItems;
+            }
+            // Default fallback - semua item aktif
+            else {
+                activeItems = allItems;
+            }
+            
+            return activeItems;
+            
+        } catch (error) {
+            console.error('Error parsing database array:', error);
+            return allItems;
         }
-        // Jika data adalah JSON string
-        else if (typeof data === 'string') {
-            const parsed = JSON.parse(data);
-            return Array.isArray(parsed) ? parsed : defaultArray;
-        }
-        // Default fallback
-        else {
-            return defaultArray;
-        }
-    } catch (error) {
-        console.error('Error parsing database array:', error);
-        return defaultArray;
     }
-}
     
     // Update rating display
     function updateRatingDisplay(rating, reviewCount) {
